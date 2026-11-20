@@ -81,7 +81,6 @@
   const GOOGLE_SCRIPT_URL = "https://google.com";
 
   let dataPemilih = [];
-  let hitunganLokal = 0;
 
   const tpsSelect = document.getElementById('tps');
   const nomorDptInput = document.getElementById('nomor_dpt');
@@ -114,9 +113,9 @@
       for (let i = 1; i < baris.length; i++) {
         const kolom = baris[i].split(';');
         if (kolom.length >= 3) {
-          const no = kolom[0].trim();
-          const nama = kolom[1].trim();
-          const lp = kolom[2].trim();
+          const no = kolom.trim();
+          const nama = kolom.trim();
+          const lp = kolom.trim();
           
           if (no && !isNaN(no)) {
             dataPemilih.push({ No: no, Nama: nama, LP: lp });
@@ -156,15 +155,13 @@
     }
   });
 
-  // 3. Kirim data ke Google Spreadsheet menggunakan mode no-cors
+  // 3. Kirim data ke Google Spreadsheet menggunakan fetch GET standar (mengikuti redirect Google)
   document.getElementById('absenForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     btnSubmit.disabled = true;
     btnSubmit.textContent = "Menyimpan...";
 
     const namaTersimpan = namaInput.value;
-    const waktuSimpan = new Date().toLocaleTimeString('id-ID') + " WIB";
-
     const params = new URLSearchParams({
       tps: tpsSelect.value,
       nomor_dpt: nomorDptInput.value,
@@ -173,22 +170,29 @@
     });
 
     try {
-      await fetch(GOOGLE_SCRIPT_URL + "?" + params.toString(), {
+      const response = await fetch(GOOGLE_SCRIPT_URL + "?" + params.toString(), {
         method: 'GET',
-        mode: 'no-cors'
+        redirect: 'follow'
       });
+      
+      const data = await response.json();
 
-      hitunganLokal++;
-      urutInput.value = "Tercatat otomatis di Spreadsheet (Sesi ini: #" + hitunganLokal + ")";
-      ketInput.value = waktuSimpan;
-      showStatus("Berhasil dikirim ke Spreadsheet: " + namaTersimpan + " (" + waktuSimpan + ")", "success");
+      if (data.status === "success") {
+        urutInput.value = data.nomor_urut;
+        ketInput.value = data.timestamp;
+        showStatus("Tersimpan di Spreadsheet! Urutan ke-" + data.nomor_urut + " (" + namaTersimpan + ")", "success");
 
-      nomorDptInput.value = "";
-      namaInput.value = "";
-      jkInput.value = "";
-      nomorDptInput.focus();
+        nomorDptInput.value = "";
+        namaInput.value = "";
+        jkInput.value = "";
+        nomorDptInput.focus();
+      } else {
+        showStatus("Gagal dari server: " + data.message, "error");
+        btnSubmit.disabled = false;
+      }
     } catch (err) {
-      showStatus("Koneksi internet terputus. Gagal mengirim data.", "error");
+      showStatus("Gagal terhubung ke Spreadsheet: " + err.message, "error");
+      btnSubmit.disabled = false;
     } finally {
       btnSubmit.textContent = "Simpan Kehadiran";
     }
@@ -196,7 +200,6 @@
 
   function resetForm() {
     dataPemilih = [];
-    hitunganLokal = 0;
     nomorDptInput.value = "";
     nomorDptInput.disabled = true;
     namaInput.value = "";
