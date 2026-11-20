@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daftar Hadir Pemilih - Pilkades Kebondowo 2026</title>
-  <script src="https://cloudflare.com"></script>
   <style>
     body { font-family: system-ui, sans-serif; background: #f4f6f8; padding: 20px; max-width: 500px; margin: auto; }
     .card { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
@@ -79,7 +78,7 @@
 
 <script>
   const GITHUB_BASE_URL = "./";
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxCE6Yoj7FVsy8mF8m76ammS1K4YoGGydMOgPXRXEVxsYGBE_bJmlU-VRdo99al7D6VQ/exec";
+  const GOOGLE_SCRIPT_URL = "https://google.com";
 
   let dataPemilih = [];
 
@@ -92,7 +91,7 @@
   const btnSubmit = document.getElementById('btnSubmit');
   const statusDiv = document.getElementById('status');
 
-  // 1. Ambil CSV dari GitHub saat TPS dipilih
+  // 1. Ambil dan baca CSV langsung dengan JavaScript murni
   tpsSelect.addEventListener('change', async function() {
     const tps = this.value;
     resetForm();
@@ -107,24 +106,34 @@
         throw new Error(`HTTP ${response.status} - File "${tps}.csv" tidak ditemukan.`);
       }
       const csvText = await response.text();
+      
+      // Pisahkan per baris dan baca kolom pemisah titik koma (;)
+      const baris = csvText.split(/\r?\n/);
+      dataPemilih = [];
 
-      Papa.parse(csvText, {
-        header: true,
-        delimiter: ";",
-        skipEmptyLines: true,
-        complete: function(results) {
-          dataPemilih = results.data.filter(row => row.No && !isNaN(row.No.trim()));
+      for (let i = 1; i < baris.length; i++) {
+        const kolom = baris[i].split(';');
+        if (kolom.length >= 3) {
+          const no = kolom[0].trim();
+          const nama = kolom[1].trim();
+          const lp = kolom[2].trim();
           
-          if (dataPemilih.length === 0) {
-            showStatus("File CSV berhasil dimuat, tetapi 0 data terbaca.", "error");
-            return;
+          // Masukkan hanya jika kolom No berupa angka valid
+          if (no && !isNaN(no)) {
+            dataPemilih.push({ No: no, Nama: nama, LP: lp });
           }
-
-          nomorDptInput.disabled = false;
-          nomorDptInput.focus();
-          showStatus("Data " + tps + " siap (" + dataPemilih.length + " pemilih).", "success");
         }
-      });
+      }
+
+      if (dataPemilih.length === 0) {
+        showStatus("File CSV terbaca, tetapi 0 data pemilih ditemukan.", "error");
+        return;
+      }
+
+      nomorDptInput.disabled = false;
+      nomorDptInput.focus();
+      showStatus("Data " + tps + " siap (" + dataPemilih.length + " pemilih).", "success");
+
     } catch (err) {
       showStatus("Gagal memuat: " + err.message, "error");
     }
@@ -133,11 +142,11 @@
   // 2. Cari Nama & Jenis Kelamin otomatis berdasarkan Nomor DPT
   nomorDptInput.addEventListener('input', function() {
     const dicari = this.value.trim();
-    const pemilih = dataPemilih.find(row => row.No && row.No.trim() === dicari);
+    const pemilih = dataPemilih.find(row => row.No === dicari);
 
     if (pemilih) {
-      namaInput.value = pemilih.Nama ? pemilih.Nama.trim() : "";
-      jkInput.value = pemilih["L/P"] ? pemilih["L/P"].trim() : "";
+      namaInput.value = pemilih.Nama;
+      jkInput.value = pemilih.LP;
       ketInput.value = new Date().toLocaleTimeString('id-ID') + " WIB";
       btnSubmit.disabled = false;
     } else {
