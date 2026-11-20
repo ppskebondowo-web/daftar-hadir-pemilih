@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daftar Hadir Pemilih - Pilkades Kebondowo 2026</title>
+  <script src="https://cloudflare.com"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f4f6f8; padding: 20px; max-width: 500px; margin: auto; }
+    .card { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    h2 { margin-top: 0; font-size: 1.25rem; color: #1a202c; text-align: center; }
+    p.sub { text-align: center; color: #4a5568; font-size: 0.9rem; margin-bottom: 20px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem; color: #2d3748; }
+    select, input { width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
+    input[readonly] { background-color: #edf2f7; color: #4a5568; font-weight: 500; }
+    button { width: 100%; padding: 12px; background: #2b6cb0; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    button:disabled { background: #a0aec0; cursor: not-allowed; }
+    #status { margin-top: 15px; padding: 10px; border-radius: 6px; text-align: center; font-size: 0.9rem; display: none; }
+    .success { background: #c6f6d5; color: #22543d; }
+    .error { background: #fed7d7; color: #742a2a; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>DAFTAR HADIR PEMILIH</h2>
+  <p class="sub">Pilkades Kebondowo Tahun 2026<br>Senin, 14 Desember 2026</p>
+
+  <form id="absenForm">
+    <div class="form-group">
+      <label for="tps">Pilih TPS</label>
+      <select id="tps" required>
+        <option value="">-- Pilih TPS --</option>
+        <option value="TPS 001">TPS 001</option>
+        <option value="TPS 002">TPS 002</option>
+        <option value="TPS 003">TPS 003</option>
+        <option value="TPS 004">TPS 004</option>
+        <option value="TPS 005">TPS 005</option>
+        <option value="TPS 006">TPS 006</option>
+        <option value="TPS 007">TPS 007</option>
+        <option value="TPS 008">TPS 008</option>
+        <option value="TPS 009">TPS 009</option>
+        <option value="TPS 010">TPS 010</option>
+        <option value="TPS 011">TPS 011</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="nomor_urut">Nomor Urut Kedatangan (Otomatis)</label>
+      <input type="text" id="nomor_urut" value="Otomatis tercatat saat simpan" readonly>
+    </div>
+
+    <div class="form-group">
+      <label for="nomor_dpt">Nomor DPT</label>
+      <input type="number" id="nomor_dpt" placeholder="Ketik nomor urut DPT..." disabled required>
+    </div>
+
+    <div class="form-group">
+      <label for="nama">Nama Pemilih</label>
+      <input type="text" id="nama" readonly placeholder="Terisi otomatis...">
+    </div>
+
+    <div class="form-group">
+      <label for="jenis_kelamin">Jenis Kelamin</label>
+      <input type="text" id="jenis_kelamin" readonly placeholder="Terisi otomatis...">
+    </div>
+
+    <div class="form-group">
+      <label for="keterangan">Keterangan (Waktu Kehadiran)</label>
+      <input type="text" id="keterangan" readonly placeholder="Terisi timestamp saat disimpan...">
+    </div>
+
+    <button type="submit" id="btnSubmit" disabled>Simpan Kehadiran</button>
+  </form>
+
+  <div id="status"></div>
+</div>
+
+<script>
+  // GANTI DUA URL DI BAWAH INI DENGAN MILIK ANDA
+  const GITHUB_BASE_URL = "https://githubusercontent.com";
+  const GOOGLE_SCRIPT_URL = "https://google.com";
+
+  let dataPemilih = [];
+
+  const tpsSelect = document.getElementById('tps');
+  const nomorDptInput = document.getElementById('nomor_dpt');
+  const namaInput = document.getElementById('nama');
+  const jkInput = document.getElementById('jenis_kelamin');
+  const ketInput = document.getElementById('keterangan');
+  const urutInput = document.getElementById('nomor_urut');
+  const btnSubmit = document.getElementById('btnSubmit');
+  const statusDiv = document.getElementById('status');
+
+  // 1. Ambil CSV dari GitHub saat TPS dipilih
+  tpsSelect.addEventListener('change', function() {
+    const tps = this.value;
+    resetForm();
+    if (!tps) return;
+
+    showStatus("Memuat data " + tps + "...", "success");
+    const fileUrl = GITHUB_BASE_URL + encodeURIComponent(tps + ".csv");
+
+    Papa.parse(fileUrl, {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: function(results) {
+        dataPemilih = results.data;
+        nomorDptInput.disabled = false;
+        nomorDptInput.focus();
+        showStatus("Data " + tps + " siap (" + dataPemilih.length + " pemilih).", "success");
+      },
+      error: function() {
+        showStatus("Gagal memuat file CSV. Periksa koneksi atau nama file di GitHub.", "error");
+      }
+    });
+  });
+
+  // 2. Cari Nama & Jenis Kelamin otomatis saat Nomor DPT diketik
+  nomorDptInput.addEventListener('input', function() {
+    const dicari = this.value.trim();
+    const pemilih = dataPemilih.find(row => row.nomor_dpt == dicari);
+
+    if (pemilih) {
+      namaInput.value = pemilih.nama || "";
+      jkInput.value = pemilih.jenis_kelamin || "";
+      ketInput.value = new Date().toLocaleTimeString('id-ID') + " WIB";
+      btnSubmit.disabled = false;
+    } else {
+      namaInput.value = "";
+      jkInput.value = "";
+      ketInput.value = "";
+      btnSubmit.disabled = true;
+    }
+  });
+
+  // 3. Kirim data ke Google Spreadsheet
+  document.getElementById('absenForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = "Menyimpan...";
+
+    const formData = new URLSearchParams();
+    formData.append('tps', tpsSelect.value);
+    formData.append('nomor_dpt', nomorDptInput.value);
+    formData.append('nama', namaInput.value);
+    formData.append('jenis_kelamin', jkInput.value);
+
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "success") {
+        urutInput.value = data.nomor_urut;
+        ketInput.value = data.timestamp;
+        showStatus("Tersimpan! Urutan hadir ke-" + data.nomor_urut + " (" + namaInput.value + ")", "success");
+        
+        // Bersihkan input DPT untuk pemilih berikutnya
+        nomorDptInput.value = "";
+        namaInput.value = "";
+        jkInput.value = "";
+        nomorDptInput.focus();
+      } else {
+        showStatus("Error: " + data.message, "error");
+      }
+    })
+    .catch(err => {
+      showStatus("Gagal terhubung ke Spreadsheet.", "error");
+    })
+    .finally(() => {
+      btnSubmit.textContent = "Simpan Kehadiran";
+    });
+  });
+
+  function resetForm() {
+    dataPemilih = [];
+    nomorDptInput.value = "";
+    nomorDptInput.disabled = true;
+    namaInput.value = "";
+    jkInput.value = "";
+    ketInput.value = "";
+    urutInput.value = "Otomatis tercatat saat simpan";
+    btnSubmit.disabled = true;
+    statusDiv.style.display = "none";
+  }
+
+  function showStatus(msg, type) {
+    statusDiv.textContent = msg;
+    statusDiv.className = type;
+    statusDiv.style.display = "block";
+  }
+</script>
+
+</body>
+</html>
