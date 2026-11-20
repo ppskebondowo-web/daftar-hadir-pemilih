@@ -76,9 +76,8 @@
 
   <div id="status"></div>
 </div>
-
 <script>
-  // GANTI DUA URL DI BAWAH INI DENGAN MILIK ANDA
+  // 1. PASTIKAN DUA BARIS INI SUDAH DIGANTI DENGAN LINK ASLI MILIK ANDA
   const GITHUB_BASE_URL = "https://githubusercontent.com";
   const GOOGLE_SCRIPT_URL = "https://google.com";
 
@@ -93,36 +92,51 @@
   const btnSubmit = document.getElementById('btnSubmit');
   const statusDiv = document.getElementById('status');
 
-  // 1. Ambil CSV dari GitHub saat TPS dipilih
-  tpsSelect.addEventListener('change', function() {
+  // Ambil CSV dari GitHub saat TPS dipilih
+  tpsSelect.addEventListener('change', async function() {
     const tps = this.value;
     resetForm();
     if (!tps) return;
 
+    // Cek apakah URL placeholder belum diganti
+    if (GITHUB_BASE_URL.includes("USERNAME/REPO")) {
+      showStatus("ERROR: Anda belum mengganti GITHUB_BASE_URL di dalam kode HTML!", "error");
+      return;
+    }
+
     showStatus("Memuat data " + tps + "...", "success");
-    // Pastikan nama file di GitHub adalah "TPS 001.csv", "TPS 002.csv", dst.
     const fileUrl = GITHUB_BASE_URL + encodeURIComponent(tps + ".csv");
 
-    Papa.parse(fileUrl, {
-      download: true,
-      header: true,
-      delimiter: ";", // Disesuaikan dengan pemisah titik koma pada file Anda
-      skipEmptyLines: true,
-      complete: function(results) {
-        // Filter hanya baris yang kolom 'No'-nya berupa angka valid (mengabaikan baris rekap jumlah di bawah)
-        dataPemilih = results.data.filter(row => row.No && !isNaN(row.No.trim()));
-        
-        nomorDptInput.disabled = false;
-        nomorDptInput.focus();
-        showStatus("Data " + tps + " siap (" + dataPemilih.length + " pemilih).", "success");
-      },
-      error: function() {
-        showStatus("Gagal memuat file CSV. Periksa koneksi atau nama file di GitHub.", "error");
+    try {
+      const response = await fetch(fileUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} - File "${tps}.csv" tidak ditemukan di URL tersebut.`);
       }
-    });
+      const csvText = await response.text();
+
+      Papa.parse(csvText, {
+        header: true,
+        delimiter: ";",
+        skipEmptyLines: true,
+        complete: function(results) {
+          dataPemilih = results.data.filter(row => row.No && !isNaN(row.No.trim()));
+          
+          if (dataPemilih.length === 0) {
+            showStatus("File CSV berhasil dimuat, tetapi 0 data terbaca. Periksa pemisah (;).", "error");
+            return;
+          }
+
+          nomorDptInput.disabled = false;
+          nomorDptInput.focus();
+          showStatus("Data " + tps + " siap (" + dataPemilih.length + " pemilih).", "success");
+        }
+      });
+    } catch (err) {
+      showStatus("Gagal memuat: " + err.message + " (Cek link: " + fileUrl + ")", "error");
+    }
   });
 
-  // 2. Cari Nama & Jenis Kelamin otomatis berdasarkan kolom 'No', 'Nama', dan 'L/P'
+  // Cari Nama & Jenis Kelamin otomatis berdasarkan Nomor DPT
   nomorDptInput.addEventListener('input', function() {
     const dicari = this.value.trim();
     const pemilih = dataPemilih.find(row => row.No && row.No.trim() === dicari);
@@ -140,7 +154,7 @@
     }
   });
 
-  // 3. Kirim data ke Google Spreadsheet
+  // Kirim data ke Google Spreadsheet
   document.getElementById('absenForm').addEventListener('submit', function(e) {
     e.preventDefault();
     btnSubmit.disabled = true;
@@ -163,7 +177,6 @@
         ketInput.value = data.timestamp;
         showStatus("Tersimpan! Urutan hadir ke-" + data.nomor_urut + " (" + namaInput.value + ")", "success");
         
-        // Bersihkan input DPT untuk pemilih berikutnya
         nomorDptInput.value = "";
         namaInput.value = "";
         jkInput.value = "";
@@ -173,7 +186,7 @@
       }
     })
     .catch(err => {
-      showStatus("Gagal terhubung ke Spreadsheet.", "error");
+      showStatus("Gagal terhubung ke Spreadsheet. Pastikan GOOGLE_SCRIPT_URL benar.", "error");
     })
     .finally(() => {
       btnSubmit.textContent = "Simpan Kehadiran";
@@ -198,6 +211,5 @@
     statusDiv.style.display = "block";
   }
 </script>
-
 </body>
 </html>
