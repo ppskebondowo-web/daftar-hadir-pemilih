@@ -91,7 +91,7 @@
   const btnSubmit = document.getElementById('btnSubmit');
   const statusDiv = document.getElementById('status');
 
-  // 1. Ambil dan baca CSV langsung
+  // 1. Ambil dan baca CSV langsung tanpa indeks kurung siku
   tpsSelect.addEventListener('change', async function() {
     const tps = this.value;
     resetForm();
@@ -111,11 +111,11 @@
       dataPemilih = [];
 
       for (let i = 1; i < baris.length; i++) {
-        const kolom = baris[i].split(';');
+        const kolom = baris.at(i).split(';');
         if (kolom.length >= 3) {
-          const no = kolom.trim();
-          const nama = kolom.trim();
-          const lp = kolom.trim();
+          const no = kolom.at(0).trim();
+          const nama = kolom.at(1).trim();
+          const lp = kolom.at(2).trim();
           
           if (no && !isNaN(no)) {
             dataPemilih.push({ No: no, Nama: nama, LP: lp });
@@ -155,7 +155,7 @@
     }
   });
 
-  // 3. Kirim data ke Google Spreadsheet menggunakan fetch GET standar (mengikuti redirect Google)
+  // 3. Kirim data ke Google Spreadsheet
   document.getElementById('absenForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     btnSubmit.disabled = true;
