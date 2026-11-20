@@ -91,7 +91,7 @@
   const btnSubmit = document.getElementById('btnSubmit');
   const statusDiv = document.getElementById('status');
 
-  // 1. Ambil dan baca CSV langsung tanpa indeks kurung siku
+  // 1. Ambil dan baca CSV langsung
   tpsSelect.addEventListener('change', async function() {
     const tps = this.value;
     resetForm();
@@ -155,27 +155,30 @@
     }
   });
 
-  // 3. Kirim data ke Google Spreadsheet
-  document.getElementById('absenForm').addEventListener('submit', async function(e) {
+  // 3. Kirim data via JSONP (Bebas blokir CORS 100%)
+  document.getElementById('absenForm').addEventListener('submit', function(e) {
     e.preventDefault();
     btnSubmit.disabled = true;
     btnSubmit.textContent = "Menyimpan...";
 
     const namaTersimpan = namaInput.value;
+    const callbackName = "cb_" + Date.now();
+
     const params = new URLSearchParams({
       tps: tpsSelect.value,
       nomor_dpt: nomorDptInput.value,
       nama: namaTersimpan,
-      jenis_kelamin: jkInput.value
+      jenis_kelamin: jkInput.value,
+      callback: callbackName
     });
 
-    try {
-      const response = await fetch(GOOGLE_SCRIPT_URL + "?" + params.toString(), {
-        method: 'GET',
-        redirect: 'follow'
-      });
-      
-      const data = await response.json();
+    const script = document.createElement('script');
+    script.src = GOOGLE_SCRIPT_URL + "?" + params.toString();
+
+    window[callbackName] = function(data) {
+      delete window[callbackName];
+      script.remove();
+      btnSubmit.textContent = "Simpan Kehadiran";
 
       if (data.status === "success") {
         urutInput.value = data.nomor_urut;
@@ -190,12 +193,17 @@
         showStatus("Gagal dari server: " + data.message, "error");
         btnSubmit.disabled = false;
       }
-    } catch (err) {
-      showStatus("Gagal terhubung ke Spreadsheet: " + err.message, "error");
-      btnSubmit.disabled = false;
-    } finally {
+    };
+
+    script.onerror = function() {
+      delete window[callbackName];
+      script.remove();
       btnSubmit.textContent = "Simpan Kehadiran";
-    }
+      btnSubmit.disabled = false;
+      showStatus("Gagal terhubung ke server Google Apps Script. Cek koneksi internet.", "error");
+    };
+
+    document.body.appendChild(script);
   });
 
   function resetForm() {
