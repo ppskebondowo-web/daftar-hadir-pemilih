@@ -100,14 +100,18 @@
     if (!tps) return;
 
     showStatus("Memuat data " + tps + "...", "success");
+    // Pastikan nama file di GitHub adalah "TPS 001.csv", "TPS 002.csv", dst.
     const fileUrl = GITHUB_BASE_URL + encodeURIComponent(tps + ".csv");
 
     Papa.parse(fileUrl, {
       download: true,
       header: true,
+      delimiter: ";", // Disesuaikan dengan pemisah titik koma pada file Anda
       skipEmptyLines: true,
       complete: function(results) {
-        dataPemilih = results.data;
+        // Filter hanya baris yang kolom 'No'-nya berupa angka valid (mengabaikan baris rekap jumlah di bawah)
+        dataPemilih = results.data.filter(row => row.No && !isNaN(row.No.trim()));
+        
         nomorDptInput.disabled = false;
         nomorDptInput.focus();
         showStatus("Data " + tps + " siap (" + dataPemilih.length + " pemilih).", "success");
@@ -118,14 +122,14 @@
     });
   });
 
-  // 2. Cari Nama & Jenis Kelamin otomatis saat Nomor DPT diketik
+  // 2. Cari Nama & Jenis Kelamin otomatis berdasarkan kolom 'No', 'Nama', dan 'L/P'
   nomorDptInput.addEventListener('input', function() {
     const dicari = this.value.trim();
-    const pemilih = dataPemilih.find(row => row.nomor_dpt == dicari);
+    const pemilih = dataPemilih.find(row => row.No && row.No.trim() === dicari);
 
     if (pemilih) {
-      namaInput.value = pemilih.nama || "";
-      jkInput.value = pemilih.jenis_kelamin || "";
+      namaInput.value = pemilih.Nama ? pemilih.Nama.trim() : "";
+      jkInput.value = pemilih["L/P"] ? pemilih["L/P"].trim() : "";
       ketInput.value = new Date().toLocaleTimeString('id-ID') + " WIB";
       btnSubmit.disabled = false;
     } else {
