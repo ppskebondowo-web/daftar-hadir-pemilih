@@ -114,9 +114,9 @@
       for (let i = 1; i < baris.length; i++) {
         const kolom = baris[i].split(';');
         if (kolom.length >= 3) {
-          const no = kolom.trim();
-          const nama = kolom.trim();
-          const lp = kolom.trim();
+          const no = kolom[0].trim();
+          const nama = kolom[1].trim();
+          const lp = kolom[2].trim();
           
           if (no && !isNaN(no)) {
             dataPemilih.push({ No: no, Nama: nama, LP: lp });
@@ -156,7 +156,7 @@
     }
   });
 
-  // 3. Kirim data ke Google Spreadsheet menggunakan mode no-cors (Anti blokir browser)
+  // 3. Kirim data ke Google Spreadsheet menggunakan mode no-cors
   document.getElementById('absenForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     btnSubmit.disabled = true;
