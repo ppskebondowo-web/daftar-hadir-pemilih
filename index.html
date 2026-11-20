@@ -76,10 +76,10 @@
 
   <div id="status"></div>
 </div>
+
 <script>
-  // 1. PASTIKAN DUA BARIS INI SUDAH DIGANTI DENGAN LINK ASLI MILIK ANDA
   const GITHUB_BASE_URL = "https://githubusercontent.com";
-  const GOOGLE_SCRIPT_URL = "https://google.com";
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxCE6Yoj7FVsy8mF8m76ammS1K4YoGGydMOgPXRXEVxsYGBE_bJmlU-VRdo99al7D6VQ/exec";
 
   let dataPemilih = [];
 
@@ -92,17 +92,11 @@
   const btnSubmit = document.getElementById('btnSubmit');
   const statusDiv = document.getElementById('status');
 
-  // Ambil CSV dari GitHub saat TPS dipilih
+  // 1. Ambil CSV dari GitHub saat TPS dipilih
   tpsSelect.addEventListener('change', async function() {
     const tps = this.value;
     resetForm();
     if (!tps) return;
-
-    // Cek apakah URL placeholder belum diganti
-    if (GITHUB_BASE_URL.includes("USERNAME/REPO")) {
-      showStatus("ERROR: Anda belum mengganti GITHUB_BASE_URL di dalam kode HTML!", "error");
-      return;
-    }
 
     showStatus("Memuat data " + tps + "...", "success");
     const fileUrl = GITHUB_BASE_URL + encodeURIComponent(tps + ".csv");
@@ -110,7 +104,7 @@
     try {
       const response = await fetch(fileUrl);
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status} - File "${tps}.csv" tidak ditemukan di URL tersebut.`);
+        throw new Error(`HTTP ${response.status} - File "${tps}.csv" tidak ditemukan.`);
       }
       const csvText = await response.text();
 
@@ -122,7 +116,7 @@
           dataPemilih = results.data.filter(row => row.No && !isNaN(row.No.trim()));
           
           if (dataPemilih.length === 0) {
-            showStatus("File CSV berhasil dimuat, tetapi 0 data terbaca. Periksa pemisah (;).", "error");
+            showStatus("File CSV berhasil dimuat, tetapi 0 data terbaca.", "error");
             return;
           }
 
@@ -132,11 +126,11 @@
         }
       });
     } catch (err) {
-      showStatus("Gagal memuat: " + err.message + " (Cek link: " + fileUrl + ")", "error");
+      showStatus("Gagal memuat: " + err.message, "error");
     }
   });
 
-  // Cari Nama & Jenis Kelamin otomatis berdasarkan Nomor DPT
+  // 2. Cari Nama & Jenis Kelamin otomatis berdasarkan Nomor DPT
   nomorDptInput.addEventListener('input', function() {
     const dicari = this.value.trim();
     const pemilih = dataPemilih.find(row => row.No && row.No.trim() === dicari);
@@ -154,7 +148,7 @@
     }
   });
 
-  // Kirim data ke Google Spreadsheet
+  // 3. Kirim data ke Google Spreadsheet
   document.getElementById('absenForm').addEventListener('submit', function(e) {
     e.preventDefault();
     btnSubmit.disabled = true;
@@ -186,7 +180,7 @@
       }
     })
     .catch(err => {
-      showStatus("Gagal terhubung ke Spreadsheet. Pastikan GOOGLE_SCRIPT_URL benar.", "error");
+      showStatus("Gagal terhubung ke Spreadsheet.", "error");
     })
     .finally(() => {
       btnSubmit.textContent = "Simpan Kehadiran";
@@ -211,5 +205,6 @@
     statusDiv.style.display = "block";
   }
 </script>
+
 </body>
 </html>
