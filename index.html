@@ -49,20 +49,40 @@
       <label for="tps">Lokasi TPS</label>
       <select id="tps" required>
         <option value="">-- Pilih TPS --</option>
-        <option value="TPS 001">TPS 001</option><option value="TPS 002">TPS 002</option>
-        <option value="TPS 003">TPS 003</option><option value="TPS 004">TPS 004</option>
-        <option value="TPS 005">TPS 005</option><option value="TPS 006">TPS 006</option>
-        <option value="TPS 007">TPS 007</option><option value="TPS 008">TPS 008</option>
-        <option value="TPS 009">TPS 009</option><option value="TPS 010">TPS 010</option>
+        <option value="TPS 001">TPS 001</option>
+        <option value="TPS 002">TPS 002</option>
+        <option value="TPS 003">TPS 003</option>
+        <option value="TPS 004">TPS 004</option>
+        <option value="TPS 005">TPS 005</option>
+        <option value="TPS 006">TPS 006</option>
+        <option value="TPS 007">TPS 007</option>
+        <option value="TPS 008">TPS 008</option>
+        <option value="TPS 009">TPS 009</option>
+        <option value="TPS 010">TPS 010</option>
         <option value="TPS 011">TPS 011</option>
       </select>
     </div>
-    <div class="fg"><label>Nomor Urut Kedatangan</label><input type="text" id="nomor_urut" value="Otomatis tercatat saat simpan" readonly></div>
-    <div class="fg"><label for="nomor_dpt">Nomor DPT</label><input type="number" id="nomor_dpt" placeholder="Masukkan nomor urut DPT..." disabled required></div>
-    <div class="fg"><label>Nama Lengkap Pemilih</label><input type="text" id="nama" readonly placeholder="Terisi otomatis"></div>
+    <div class="fg">
+      <label>Nomor Urut Kedatangan</label>
+      <input type="text" id="nomor_urut" value="Otomatis tercatat saat simpan" readonly>
+    </div>
+    <div class="fg">
+      <label for="nomor_dpt">Nomor DPT</label>
+      <input type="number" id="nomor_dpt" placeholder="Masukkan nomor urut DPT..." disabled required>
+    </div>
+    <div class="fg">
+      <label>Nama Lengkap Pemilih</label>
+      <input type="text" id="nama" readonly placeholder="Terisi otomatis">
+    </div>
     <div class="row-2 fg">
-      <div><label>Jenis Kelamin</label><input type="text" id="jenis_kelamin" readonly placeholder="-"></div>
-      <div><label>Waktu Kehadiran</label><input type="text" id="keterangan" readonly placeholder="-"></div>
+      <div>
+        <label>Jenis Kelamin</label>
+        <input type="text" id="jenis_kelamin" readonly placeholder="-">
+      </div>
+      <div>
+        <label>Waktu Kehadiran</label>
+        <input type="text" id="keterangan" readonly placeholder="-">
+      </div>
     </div>
     <button type="submit" id="btnSubmit" disabled>Simpan Kehadiran</button>
   </form>
@@ -106,7 +126,6 @@
       }
       if (dataPemilih.length === 0) throw new Error("0 data pemilih terbaca di file CSV.");
 
-      // Muat data sesi lokal dari penyimpanan HP/Laptop agar tetap aman jika refresh
       const simpananLokal = JSON.parse(localStorage.getItem("absen_" + tps) || "[]");
       simpananLokal.forEach(item => {
         daftarSudahHadir.add(item.no);
@@ -161,13 +180,12 @@
       tps: tpsAktif, action: "save", nomor_dpt: dptDikirim, nama: namaDikirim, jenis_kelamin: jkDikirim
     });
 
-    // Ganti baris navigator.sendBeacon(...) dengan baris ini:
-    fetch(GOOGLE_SCRIPT_URL + "?" + params.toString(), {
-      method: "POST",
+    // Kirim GET langsung ke doGet(e) Google Apps Script tanpa diblokir nosniff/CORS
+    fetch(GOOGLE_SCRIPT_URL + "?" + params.toString() + "&t=" + Date.now(), {
+      method: "GET",
       mode: "no-cors"
     });
 
-    // Simpan ke memori lokal perangkat untuk rekap & cegah input ganda instan
     daftarSudahHadir.add(dptDikirim);
     if (jkDikirim === "L") countL++;
     if (jkDikirim === "P") countP++;
@@ -204,10 +222,6 @@
   function showStatus(msg, type) {
     statusDiv.textContent = msg; statusDiv.className = type; statusDiv.style.display = "block";
   }
-    const imgPing = new Image();
-    imgPing.src = GOOGLE_SCRIPT_URL + "?" + params.toString() + "&t=" + Date.now();
-
 </script>
 </body>
 </html>
-
