@@ -80,7 +80,7 @@
   const SCRIPT_ID = "AKfycbyxCE6Yoj7FVsy8mF8m76ammS1K4YoGGydMOgPXRXEVxsYGBE_bJmlU-VRdo99al7D6VQ";
   const GOOGLE_SCRIPT_URL = "https://google.com" + SCRIPT_ID + "/exec";
 
-  let dataPemilih = [], daftarSudahHadir = new Set();
+  let dataPemilih = [], daftarSudahHadir = new Set(), countL = 0, countP = 0;
   const tpsSelect = document.getElementById('tps'), nomorDptInput = document.getElementById('nomor_dpt'),
         namaInput = document.getElementById('nama'), jkInput = document.getElementById('jenis_kelamin'),
         ketInput = document.getElementById('keterangan'), urutInput = document.getElementById('nomor_urut'),
@@ -91,10 +91,10 @@
     const tps = this.value;
     resetForm();
     if (!tps) return;
-    showStatus("Memuat master DPT & sinkronisasi Spreadsheet...", "success");
+    showStatus("Memuat master DPT " + tps + "...", "success");
     try {
       const response = await fetch("./" + encodeURIComponent(tps + ".csv"));
-      if (!response.ok) throw new Error(`File "${tps}.csv" tidak ditemukan.`);
+      if (!response.ok) throw new Error(`File "${tps}.csv" tidak ditemukan di GitHub.`);
       const baris = (await response.text()).split(/\r?\n/);
       dataPemilih = [];
       for (let i = 1; i < baris.length; i++) {
@@ -104,12 +104,18 @@
           if (no && !isNaN(no)) dataPemilih.push({ No: no, Nama: nama, LP: lp });
         }
       }
-      const resSheets = await fetch(GOOGLE_SCRIPT_URL + "?tps=" + encodeURIComponent(tps) + "&action=rekap", { redirect: 'follow' });
-      const dataSheets = await resSheets.json();
-      if (dataSheets.status === "success") {
-        updateRekapUI(tps, dataSheets.rekap, dataSheets.hadir);
-        urutInput.value = "Berikutnya urutan ke-" + (dataSheets.rekap.total + 1);
-      }
+      if (dataPemilih.length === 0) throw new Error("0 data pemilih terbaca di file CSV.");
+
+      // Muat data sesi lokal dari penyimpanan HP/Laptop agar tetap aman jika refresh
+      const simpananLokal = JSON.parse(localStorage.getItem("absen_" + tps) || "[]");
+      simpananLokal.forEach(item => {
+        daftarSudahHadir.add(item.no);
+        if (item.lp === "L") countL++;
+        if (item.lp === "P") countP++;
+      });
+
+      updateRekapUI(tps);
+      urutInput.value = "Berikutnya urutan ke-" + (daftarSudahHadir.size + 1);
       nomorDptInput.disabled = false;
       nomorDptInput.focus();
       showStatus("Data " + tps + " siap (" + dataPemilih.length + " DPT).", "success");
@@ -140,44 +146,52 @@
     }
   });
 
-  document.getElementById('absenForm').addEventListener('submit', async function(e) {
+  document.getElementById('absenForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    const dptDikirim = nomorDptInput.value.trim(), namaDikirim = namaInput.value, tpsAktif = tpsSelect.value;
-    btnSubmit.disabled = true; btnSubmit.textContent = "Menyimpan...";
-    const params = new URLSearchParams({ tps: tpsAktif, action: "save", nomor_dpt: dptDikirim, nama: namaDikirim, jenis_kelamin: jkInput.value });
-    try {
-      const response = await fetch(GOOGLE_SCRIPT_URL + "?" + params.toString(), { method: 'GET', redirect: 'follow' });
-      const data = await response.json();
-      if (data.status === "success") {
-        updateRekapUI(tpsAktif, data.rekap, data.hadir);
-        urutInput.value = "Tersimpan ke-" + data.nomor_urut + " (Berikutnya: #" + (data.nomor_urut + 1) + ")";
-        ketInput.value = data.timestamp;
-        showStatus("Tersimpan! Urutan ke-" + data.nomor_urut + " (" + namaDikirim + ")", "success");
-        nomorDptInput.value = ""; namaInput.value = ""; jkInput.value = ""; nomorDptInput.focus();
-      } else if (data.status === "duplicate") {
-        updateRekapUI(tpsAktif, data.rekap, data.hadir);
-        showStatus(data.message, "warning");
-      } else {
-        showStatus("Error: " + data.message, "error"); btnSubmit.disabled = false;
-      }
-    } catch (err) {
-      showStatus("Gagal terhubung ke server Spreadsheet. Coba simpan ulang.", "error"); btnSubmit.disabled = false;
-    } finally {
-      btnSubmit.textContent = "Simpan Kehadiran";
-    }
+    const dptDikirim = nomorDptInput.value.trim(), namaDikirim = namaInput.value,
+          jkDikirim = jkInput.value.toUpperCase(), tpsAktif = tpsSelect.value,
+          waktu = new Date().toLocaleTimeString('id-ID') + " WIB";
+
+    if (daftarSudahHadir.has(dptDikirim)) return;
+
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = "Menyimpan...";
+
+    const params = new URLSearchParams({
+      tps: tpsAktif, action: "save", nomor_dpt: dptDikirim, nama: namaDikirim, jenis_kelamin: jkDikirim
+    });
+
+    // Kirim langsung ke Google Spreadsheet tanpa terblokir CORS
+    navigator.sendBeacon(GOOGLE_SCRIPT_URL + "?" + params.toString());
+
+    // Simpan ke memori lokal perangkat untuk rekap & cegah input ganda instan
+    daftarSudahHadir.add(dptDikirim);
+    if (jkDikirim === "L") countL++;
+    if (jkDikirim === "P") countP++;
+
+    const simpananLokal = JSON.parse(localStorage.getItem("absen_" + tpsAktif) || "[]");
+    simpananLokal.push({ no: dptDikirim, lp: jkDikirim });
+    localStorage.setItem("absen_" + tpsAktif, JSON.stringify(simpananLokal));
+
+    updateRekapUI(tpsAktif);
+    urutInput.value = "Tersimpan ke-" + daftarSudahHadir.size + " (Berikutnya: #" + (daftarSudahHadir.size + 1) + ")";
+    ketInput.value = waktu;
+    btnSubmit.textContent = "Simpan Kehadiran";
+    showStatus("Tersimpan! Urutan ke-" + daftarSudahHadir.size + " (" + namaDikirim + ")", "success");
+
+    nomorDptInput.value = ""; namaInput.value = ""; jkInput.value = ""; nomorDptInput.focus();
   });
 
-  function updateRekapUI(tps, rekap, hadirArray) {
+  function updateRekapUI(tps) {
     rekapBox.style.display = "block";
     document.getElementById('rekapTitle').textContent = "Rekap Kehadiran " + tps;
-    document.getElementById('rekapL').textContent = rekap.L;
-    document.getElementById('rekapP').textContent = rekap.P;
-    document.getElementById('rekapTotal').textContent = rekap.total;
-    daftarSudahHadir = new Set(hadirArray);
+    document.getElementById('rekapL').textContent = countL;
+    document.getElementById('rekapP').textContent = countP;
+    document.getElementById('rekapTotal').textContent = daftarSudahHadir.size;
   }
 
   function resetForm() {
-    dataPemilih = []; daftarSudahHadir.clear();
+    dataPemilih = []; daftarSudahHadir.clear(); countL = 0; countP = 0;
     nomorDptInput.value = ""; nomorDptInput.disabled = true;
     namaInput.value = ""; jkInput.value = ""; ketInput.value = "";
     urutInput.value = "Otomatis tercatat saat simpan";
@@ -190,3 +204,4 @@
 </script>
 </body>
 </html>
+
