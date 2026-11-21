@@ -161,8 +161,11 @@
       tps: tpsAktif, action: "save", nomor_dpt: dptDikirim, nama: namaDikirim, jenis_kelamin: jkDikirim
     });
 
-    // Kirim langsung ke Google Spreadsheet tanpa terblokir CORS
-    navigator.sendBeacon(GOOGLE_SCRIPT_URL + "?" + params.toString());
+    // Ganti baris navigator.sendBeacon(...) dengan baris ini:
+    fetch(GOOGLE_SCRIPT_URL + "?" + params.toString(), {
+      method: "POST",
+      mode: "no-cors"
+    });
 
     // Simpan ke memori lokal perangkat untuk rekap & cegah input ganda instan
     daftarSudahHadir.add(dptDikirim);
