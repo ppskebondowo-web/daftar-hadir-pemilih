@@ -5,197 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daftar Hadir Pemilih - Pilkades Kebondowo 2026</title>
   <style>
-    :root {
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
-      --bg: #f1f5f9;
-      --card: #ffffff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --border: #e2e8f0;
-      --readonly-bg: #f8fafc;
-    }
+    :root { --primary: #4f46e5; --hover: #4338ca; --bg: #f1f5f9; --text: #0f172a; --muted: #64748b; --border: #e2e8f0; }
     * { box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 20px 16px;
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
-    }
-    .card {
-      background: var(--card);
-      width: 100%;
-      max-width: 440px;
-      padding: 28px 24px;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 4px 10px -6px rgba(15, 23, 42, 0.04);
-      align-self: flex-start;
-    }
-    .header { text-align: center; margin-bottom: 24px; }
-    .badge {
-      display: inline-block;
-      background: #eef2ff;
-      color: var(--primary);
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 5px 12px;
-      border-radius: 99px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-    h2 { margin: 0 0 4px; font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; }
-    .sub { margin: 0; color: var(--muted); font-size: 0.85rem; }
-    .fg { margin-bottom: 14px; }
-    .row-2 { display: grid; grid-template-columns: 1fr 1.3fr; gap: 12px; }
-    label {
-      display: block;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: #334155;
-      margin-bottom: 6px;
-    }
-    select, input {
-      width: 100%;
-      padding: 11px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      font-size: 0.95rem;
-      color: var(--text);
-      background: #fff;
-      transition: all 0.2s ease;
-    }
-    select:focus, input:not([readonly]):focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
-    }
-    input[readonly] {
-      background: var(--readonly-bg);
-      color: #475569;
-      font-weight: 600;
-      border-color: #f1f5f9;
-    }
-    #nomor_dpt {
-      font-size: 1.15rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-    button {
-      width: 100%;
-      padding: 13px;
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 6px;
-      transition: transform 0.1s, background 0.2s;
-    }
-    button:hover:not(:disabled) { background: var(--primary-hover); }
-    button:active:not(:disabled) { transform: scale(0.99); }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 18px 14px; display: flex; justify-content: center; }
+    .card { background: #fff; width: 100%; max-width: 440px; padding: 24px 20px; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(15,23,42,.08); }
+    .header { text-align: center; margin-bottom: 20px; }
+    .badge { display: inline-block; background: #eef2ff; color: var(--primary); font-size: .72rem; font-weight: 700; padding: 4px 12px; border-radius: 99px; margin-bottom: 8px; }
+    h2 { margin: 0 0 4px; font-size: 1.3rem; font-weight: 800; }
+    .sub { margin: 0; color: var(--muted); font-size: .85rem; }
+    .fg { margin-bottom: 12px; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1.3fr; gap: 10px; }
+    label { display: block; font-size: .78rem; font-weight: 600; color: #334155; margin-bottom: 5px; }
+    select, input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 12px; font-size: .95rem; color: var(--text); background: #fff; }
+    select:focus, input:not([readonly]):focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,.12); }
+    input[readonly] { background: #f8fafc; color: #475569; font-weight: 600; border-color: #f1f5f9; }
+    #nomor_dpt { font-size: 1.15rem; font-weight: 700; }
+    button { width: 100%; padding: 12px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-size: .95rem; font-weight: 700; cursor: pointer; margin-top: 6px; }
+    button:hover:not(:disabled) { background: var(--hover); }
     button:disabled { background: #cbd5e1; cursor: not-allowed; }
-    #status {
-      margin-top: 14px;
-      padding: 11px 14px;
-      border-radius: 12px;
-      text-align: center;
-      font-size: 0.85rem;
-      display: none;
-      font-weight: 600;
-      line-height: 1.4;
-    }
+    #status { margin-top: 12px; padding: 10px 12px; border-radius: 12px; text-align: center; font-size: .84rem; display: none; font-weight: 600; }
     .success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
     .error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
     .warning { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
-    .rekap-box {
-      margin-top: 22px;
-      padding-top: 18px;
-      border-top: 1px solid var(--border);
-      display: none;
-    }
-    .rekap-title {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--muted);
-      text-align: center;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-    }
+    .rekap-box { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); display: none; }
+    .rekap-title { font-size: .74rem; font-weight: 700; color: var(--muted); text-align: center; margin-bottom: 8px; text-transform: uppercase; }
     .rekap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
-    .rekap-item { background: #f8fafc; padding: 10px 6px; border-radius: 12px; border: 1px solid var(--border); }
+    .rekap-item { background: #f8fafc; padding: 9px 4px; border-radius: 12px; border: 1px solid var(--border); }
     .rekap-item.total { background: #eef2ff; border-color: #c7d2fe; }
-    .rekap-num { font-size: 1.3rem; font-weight: 800; color: var(--text); display: block; }
+    .rekap-num { font-size: 1.25rem; font-weight: 800; color: var(--text); display: block; }
     .rekap-item.total .rekap-num { color: var(--primary); }
-    .rekap-label { font-size: 0.7rem; color: var(--muted); font-weight: 600; }
+    .rekap-label { font-size: .7rem; color: var(--muted); font-weight: 600; }
   </style>
 </head>
 <body>
-
 <div class="card">
   <div class="header">
     <span class="badge">Senin, 14 Desember 2026</span>
     <h2>Daftar Hadir Pemilih</h2>
     <p class="sub">Pemilihan Kepala Desa Kebondowo</p>
   </div>
-
   <form id="absenForm">
     <div class="fg">
       <label for="tps">Lokasi TPS</label>
       <select id="tps" required>
         <option value="">-- Pilih TPS --</option>
-        <option value="TPS 001">TPS 001</option>
-        <option value="TPS 002">TPS 002</option>
-        <option value="TPS 003">TPS 003</option>
-        <option value="TPS 004">TPS 004</option>
-        <option value="TPS 005">TPS 005</option>
-        <option value="TPS 006">TPS 006</option>
-        <option value="TPS 007">TPS 007</option>
-        <option value="TPS 008">TPS 008</option>
-        <option value="TPS 009">TPS 009</option>
-        <option value="TPS 010">TPS 010</option>
+        <option value="TPS 001">TPS 001</option><option value="TPS 002">TPS 002</option>
+        <option value="TPS 003">TPS 003</option><option value="TPS 004">TPS 004</option>
+        <option value="TPS 005">TPS 005</option><option value="TPS 006">TPS 006</option>
+        <option value="TPS 007">TPS 007</option><option value="TPS 008">TPS 008</option>
+        <option value="TPS 009">TPS 009</option><option value="TPS 010">TPS 010</option>
         <option value="TPS 011">TPS 011</option>
       </select>
     </div>
-
-    <div class="fg">
-      <label for="nomor_urut">Nomor Urut Kedatangan</label>
-      <input type="text" id="nomor_urut" value="Otomatis tercatat saat simpan" readonly>
-    </div>
-
-    <div class="fg">
-      <label for="nomor_dpt">Nomor DPT</label>
-      <input type="number" id="nomor_dpt" placeholder="Masukkan nomor urut DPT..." disabled required>
-    </div>
-
-    <div class="fg">
-      <label for="nama">Nama Lengkap Pemilih</label>
-      <input type="text" id="nama" readonly placeholder="Terisi otomatis">
-    </div>
-
+    <div class="fg"><label>Nomor Urut Kedatangan</label><input type="text" id="nomor_urut" value="Otomatis tercatat saat simpan" readonly></div>
+    <div class="fg"><label for="nomor_dpt">Nomor DPT</label><input type="number" id="nomor_dpt" placeholder="Masukkan nomor urut DPT..." disabled required></div>
+    <div class="fg"><label>Nama Lengkap Pemilih</label><input type="text" id="nama" readonly placeholder="Terisi otomatis"></div>
     <div class="row-2 fg">
-      <div>
-        <label for="jenis_kelamin">Jenis Kelamin</label>
-        <input type="text" id="jenis_kelamin" readonly placeholder="-">
-      </div>
-      <div>
-        <label for="keterangan">Waktu Kehadiran</label>
-        <input type="text" id="keterangan" readonly placeholder="-">
-      </div>
+      <div><label>Jenis Kelamin</label><input type="text" id="jenis_kelamin" readonly placeholder="-"></div>
+      <div><label>Waktu Kehadiran</label><input type="text" id="keterangan" readonly placeholder="-"></div>
     </div>
-
     <button type="submit" id="btnSubmit" disabled>Simpan Kehadiran</button>
   </form>
-
   <div id="status"></div>
-
   <div class="rekap-box" id="rekapBox">
     <div class="rekap-title" id="rekapTitle">Rekap Kehadiran TPS</div>
     <div class="rekap-grid">
@@ -205,58 +76,40 @@
     </div>
   </div>
 </div>
-
 <script>
   const SCRIPT_ID = "AKfycbyxCE6Yoj7FVsy8mF8m76ammS1K4YoGGydMOgPXRXEVxsYGBE_bJmlU-VRdo99al7D6VQ";
   const GOOGLE_SCRIPT_URL = "https://google.com" + SCRIPT_ID + "/exec";
 
-  let dataPemilih = [];
-  let daftarSudahHadir = new Set();
-
-  const tpsSelect = document.getElementById('tps');
-  const nomorDptInput = document.getElementById('nomor_dpt');
-  const namaInput = document.getElementById('nama');
-  const jkInput = document.getElementById('jenis_kelamin');
-  const ketInput = document.getElementById('keterangan');
-  const urutInput = document.getElementById('nomor_urut');
-  const btnSubmit = document.getElementById('btnSubmit');
-  const statusDiv = document.getElementById('status');
-  const rekapBox = document.getElementById('rekapBox');
+  let dataPemilih = [], daftarSudahHadir = new Set();
+  const tpsSelect = document.getElementById('tps'), nomorDptInput = document.getElementById('nomor_dpt'),
+        namaInput = document.getElementById('nama'), jkInput = document.getElementById('jenis_kelamin'),
+        ketInput = document.getElementById('keterangan'), urutInput = document.getElementById('nomor_urut'),
+        btnSubmit = document.getElementById('btnSubmit'), statusDiv = document.getElementById('status'),
+        rekapBox = document.getElementById('rekapBox');
 
   tpsSelect.addEventListener('change', async function() {
     const tps = this.value;
     resetForm();
     if (!tps) return;
-
     showStatus("Memuat master DPT & sinkronisasi Spreadsheet...", "success");
-
     try {
       const response = await fetch("./" + encodeURIComponent(tps + ".csv"));
       if (!response.ok) throw new Error(`File "${tps}.csv" tidak ditemukan.`);
-      const csvText = await response.text();
-      
-      const baris = csvText.split(/\r?\n/);
+      const baris = (await response.text()).split(/\r?\n/);
       dataPemilih = [];
-
       for (let i = 1; i < baris.length; i++) {
         const kolom = baris.at(i).split(';');
         if (kolom.length >= 3) {
-          const no = kolom.at(0).trim();
-          const nama = kolom.at(1).trim();
-          const lp = kolom.at(2).trim();
+          const no = kolom.at(0).trim(), nama = kolom.at(1).trim(), lp = kolom.at(2).trim();
           if (no && !isNaN(no)) dataPemilih.push({ No: no, Nama: nama, LP: lp });
         }
       }
-
-      const rekapUrl = GOOGLE_SCRIPT_URL + "?tps=" + encodeURIComponent(tps) + "&action=rekap";
-      const resSheets = await fetch(rekapUrl, { redirect: 'follow' });
+      const resSheets = await fetch(GOOGLE_SCRIPT_URL + "?tps=" + encodeURIComponent(tps) + "&action=rekap", { redirect: 'follow' });
       const dataSheets = await resSheets.json();
-
       if (dataSheets.status === "success") {
         updateRekapUI(tps, dataSheets.rekap, dataSheets.hadir);
         urutInput.value = "Berikutnya urutan ke-" + (dataSheets.rekap.total + 1);
       }
-
       nomorDptInput.disabled = false;
       nomorDptInput.focus();
       showStatus("Data " + tps + " siap (" + dataPemilih.length + " DPT).", "success");
@@ -268,11 +121,9 @@
   nomorDptInput.addEventListener('input', function() {
     const dicari = this.value.trim();
     const pemilih = dataPemilih.find(row => row.No === dicari);
-
     if (pemilih) {
       namaInput.value = pemilih.Nama;
       jkInput.value = pemilih.LP;
-
       if (daftarSudahHadir.has(dicari)) {
         ketInput.value = "SUDAH HADIR";
         btnSubmit.disabled = true;
@@ -283,77 +134,59 @@
         statusDiv.style.display = "none";
       }
     } else {
-      namaInput.value = "";
-      jkInput.value = "";
-      ketInput.value = "";
-      btnSubmit.disabled = true;
+      namaInput.value = ""; jkInput.value = ""; ketInput.value = ""; btnSubmit.disabled = true;
       if (dicari !== "") showStatus("Nomor DPT " + dicari + " tidak ditemukan di " + tpsSelect.value, "error");
       else statusDiv.style.display = "none";
     }
-});
-document.getElementById('absenForm').addEventListener('submit', async function(e) {
-e.preventDefault();
-const dptDikirim = nomorDptInput.value.trim();
-const namaDikirim = namaInput.value;
-const tpsAktif = tpsSelect.value;
-btnSubmit.disabled = true;
-btnSubmit.textContent = "Menyimpan...";
-const params = new URLSearchParams({
-tps: tpsAktif,
-action: "save",
-nomor_dpt: dptDikirim,
-nama: namaDikirim,
-jenis_kelamin: jkInput.value
-});
-try {
-const response = await fetch(GOOGLE_SCRIPT_URL + "?" + params.toString(), { method: 'GET', redirect: 'follow' });
-const data = await response.json();
-if (data.status === "success") {
-updateRekapUI(tpsAktif, data.rekap, data.hadir);
-urutInput.value = "Tersimpan ke-" + data.nomor_urut + " (Berikutnya: #" + (data.nomor_urut + 1) + ")";
-ketInput.value = data.timestamp;
-showStatus("Tersimpan! Urutan ke-" + data.nomor_urut + " (" + namaDikirim + ")", "success");
-nomorDptInput.value = "";
-namaInput.value = "";
-jkInput.value = "";
-nomorDptInput.focus();
-} else if (data.status === "duplicate") {
-updateRekapUI(tpsAktif, data.rekap, data.hadir);
-showStatus(data.message, "warning");
-} else {
-showStatus("Error: " + data.message, "error");
-btnSubmit.disabled = false;
-}
-} catch (err) {
-showStatus("Gagal terhubung ke server Spreadsheet. Coba simpan ulang.", "error");
-btnSubmit.disabled = false;
-} finally {
-btnSubmit.textContent = "Simpan Kehadiran";
-}
-});
-function updateRekapUI(tps, rekap, hadirArray) {
-rekapBox.style.display = "block";
-document.getElementById('rekapTitle').textContent = "Rekap Kehadiran " + tps;
-document.getElementById('rekapL').textContent = rekap.L;
-document.getElementById('rekapP').textContent = rekap.P;
-document.getElementById('rekapTotal').textContent = rekap.total;
-daftarSudahHadir = new Set(hadirArray);
-}
-function resetForm() {
-dataPemilih = [];
-daftarSudahHadir.clear();
-nomorDptInput.value = "";
-nomorDptInput.disabled = true;
-namaInput.value = "";
-jkInput.value = "";
-ketInput.value = "";
-urutInput.value = "Otomatis tercatat saat simpan";
-btnSubmit.disabled = true;
-statusDiv.style.display = "none";
-rekapBox.style.display = "none";
-}
-function showStatus(msg, type) {
-statusDiv.textContent = msg;
-statusDiv.className = type;
-statusDiv.style.display = "block";
-}
+  });
+
+  document.getElementById('absenForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const dptDikirim = nomorDptInput.value.trim(), namaDikirim = namaInput.value, tpsAktif = tpsSelect.value;
+    btnSubmit.disabled = true; btnSubmit.textContent = "Menyimpan...";
+    const params = new URLSearchParams({ tps: tpsAktif, action: "save", nomor_dpt: dptDikirim, nama: namaDikirim, jenis_kelamin: jkInput.value });
+    try {
+      const response = await fetch(GOOGLE_SCRIPT_URL + "?" + params.toString(), { method: 'GET', redirect: 'follow' });
+      const data = await response.json();
+      if (data.status === "success") {
+        updateRekapUI(tpsAktif, data.rekap, data.hadir);
+        urutInput.value = "Tersimpan ke-" + data.nomor_urut + " (Berikutnya: #" + (data.nomor_urut + 1) + ")";
+        ketInput.value = data.timestamp;
+        showStatus("Tersimpan! Urutan ke-" + data.nomor_urut + " (" + namaDikirim + ")", "success");
+        nomorDptInput.value = ""; namaInput.value = ""; jkInput.value = ""; nomorDptInput.focus();
+      } else if (data.status === "duplicate") {
+        updateRekapUI(tpsAktif, data.rekap, data.hadir);
+        showStatus(data.message, "warning");
+      } else {
+        showStatus("Error: " + data.message, "error"); btnSubmit.disabled = false;
+      }
+    } catch (err) {
+      showStatus("Gagal terhubung ke server Spreadsheet. Coba simpan ulang.", "error"); btnSubmit.disabled = false;
+    } finally {
+      btnSubmit.textContent = "Simpan Kehadiran";
+    }
+  });
+
+  function updateRekapUI(tps, rekap, hadirArray) {
+    rekapBox.style.display = "block";
+    document.getElementById('rekapTitle').textContent = "Rekap Kehadiran " + tps;
+    document.getElementById('rekapL').textContent = rekap.L;
+    document.getElementById('rekapP').textContent = rekap.P;
+    document.getElementById('rekapTotal').textContent = rekap.total;
+    daftarSudahHadir = new Set(hadirArray);
+  }
+
+  function resetForm() {
+    dataPemilih = []; daftarSudahHadir.clear();
+    nomorDptInput.value = ""; nomorDptInput.disabled = true;
+    namaInput.value = ""; jkInput.value = ""; ketInput.value = "";
+    urutInput.value = "Otomatis tercatat saat simpan";
+    btnSubmit.disabled = true; statusDiv.style.display = "none"; rekapBox.style.display = "none";
+  }
+
+  function showStatus(msg, type) {
+    statusDiv.textContent = msg; statusDiv.className = type; statusDiv.style.display = "block";
+  }
+</script>
+</body>
+</html>
