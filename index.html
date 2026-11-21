@@ -204,6 +204,9 @@
   function showStatus(msg, type) {
     statusDiv.textContent = msg; statusDiv.className = type; statusDiv.style.display = "block";
   }
+    const imgPing = new Image();
+    imgPing.src = GOOGLE_SCRIPT_URL + "?" + params.toString() + "&t=" + Date.now();
+
 </script>
 </body>
 </html>
