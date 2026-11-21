@@ -26,13 +26,10 @@
   <h2>DAFTAR HADIR PEMILIH</h2>
   <p class="sub">Pilkades Kebondowo Tahun 2026<br>Senin, 14 Desember 2026</p>
 
-  <!-- Iframe tersembunyi untuk mengirim data tanpa blokir CORS/nosniff -->
-  <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
-
-  <form id="absenForm" action="https://google.com" method="GET" target="hidden_iframe">
+  <form id="absenForm">
     <div class="form-group">
       <label for="tps">Pilih TPS</label>
-      <select id="tps" name="tps" required>
+      <select id="tps" required>
         <option value="">-- Pilih TPS --</option>
         <option value="TPS 001">TPS 001</option>
         <option value="TPS 002">TPS 002</option>
@@ -55,17 +52,17 @@
 
     <div class="form-group">
       <label for="nomor_dpt">Nomor DPT</label>
-      <input type="number" id="nomor_dpt" name="nomor_dpt" placeholder="Ketik nomor urut DPT..." disabled required>
+      <input type="number" id="nomor_dpt" placeholder="Ketik nomor urut DPT..." disabled required>
     </div>
 
     <div class="form-group">
       <label for="nama">Nama Pemilih</label>
-      <input type="text" id="nama" name="nama" readonly placeholder="Terisi otomatis...">
+      <input type="text" id="nama" readonly placeholder="Terisi otomatis...">
     </div>
 
     <div class="form-group">
       <label for="jenis_kelamin">Jenis Kelamin</label>
-      <input type="text" id="jenis_kelamin" name="jenis_kelamin" readonly placeholder="Terisi otomatis...">
+      <input type="text" id="jenis_kelamin" readonly placeholder="Terisi otomatis...">
     </div>
 
     <div class="form-group">
@@ -81,9 +78,9 @@
 
 <script>
   const GITHUB_BASE_URL = "./";
+  const GOOGLE_SCRIPT_URL = "https://google.com";
+
   let dataPemilih = [];
-  let sedangMengirim = false;
-  let namaTerakhir = "";
   let sesiHitung = 0;
 
   const tpsSelect = document.getElementById('tps');
@@ -94,7 +91,6 @@
   const urutInput = document.getElementById('nomor_urut');
   const btnSubmit = document.getElementById('btnSubmit');
   const statusDiv = document.getElementById('status');
-  const iframe = document.getElementById('hidden_iframe');
 
   // 1. Ambil dan baca CSV langsung
   tpsSelect.addEventListener('change', async function() {
@@ -160,32 +156,38 @@
     }
   });
 
-  // 3. Saat tombol Simpan ditekan, biarkan form terkirim ke hidden_iframe
-  document.getElementById('absenForm').addEventListener('submit', function() {
-    sedangMengirim = true;
-    namaTerakhir = namaInput.value;
+  // 3. Buka jendela popup kecil untuk memicu eksekusi langsung di Google Sheets & tutup otomatis
+  document.getElementById('absenForm').addEventListener('submit', function(e) {
+    e.preventDefault();
     btnSubmit.disabled = true;
-    btnSubmit.textContent = "Menyimpan ke Spreadsheet...";
-  });
+    btnSubmit.textContent = "Menyimpan...";
 
-  // 4. Ketika hidden_iframe selesai memuat balasan dari Google Sheets
-  iframe.addEventListener('load', function() {
-    if (!sedangMengirim) return;
-    sedangMengirim = false;
-    sesiHitung++;
-
+    const namaTersimpan = namaInput.value;
     const waktu = new Date().toLocaleTimeString('id-ID') + " WIB";
-    urutInput.value = "Tersimpan (Input sesi ini ke-" + sesiHitung + ")";
-    ketInput.value = waktu;
-    btnSubmit.textContent = "Simpan Kehadiran";
 
-    showStatus("Tersimpan di Spreadsheet! (" + namaTerakhir + " - " + waktu + ")", "success");
+    const params = new URLSearchParams({
+      tps: tpsSelect.value,
+      nomor_dpt: nomorDptInput.value,
+      nama: namaTersimpan,
+      jenis_kelamin: jkInput.value
+    });
 
-    // Reset input DPT untuk pemilih berikutnya
-    nomorDptInput.value = "";
-    namaInput.value = "";
-    jkInput.value = "";
-    nomorDptInput.focus();
+    const fullUrl = GOOGLE_SCRIPT_URL + "?" + params.toString();
+    const popup = window.open(fullUrl, "SimpanSheets", "width=350,height=200,top=100,left=100");
+
+    setTimeout(function() {
+      if (popup) popup.close();
+      sesiHitung++;
+      urutInput.value = "Tersimpan (Sesi ini ke-" + sesiHitung + ")";
+      ketInput.value = waktu;
+      btnSubmit.textContent = "Simpan Kehadiran";
+      showStatus("Tersimpan! (" + namaTersimpan + " - " + waktu + ")", "success");
+
+      nomorDptInput.value = "";
+      namaInput.value = "";
+      jkInput.value = "";
+      nomorDptInput.focus();
+    }, 2000);
   });
 
   function resetForm() {
