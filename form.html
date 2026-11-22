@@ -197,7 +197,7 @@
       }
     }
 
-    function handleSubmit() {
+    async function handleSubmit() {
       if (!selectedVoter || isSubmitting) return;
       isSubmitting = true;
       const btn = document.getElementById('btn-submit');
@@ -205,21 +205,42 @@
       btn.innerText = "MENYIMPAN...";
       hideToast();
 
-      const cbName = "cb_" + Date.now();
-      const script = document.createElement("script");
-      let isDone = false;
+      const targetVoter = { ...selectedVoter };
 
-      const timer = setTimeout(() => {
-        if (!isDone) {
-          isDone = true;
-          delete window[cbName];
-          script.remove();
-          isSubmitting = false;
-          btn.disabled = false;
-          btn.innerText = "CATAT KEHADIRAN";
-          showToast('error', "Waktu habis (Timeout). Pastikan Code.gs sudah di-deploy Versi Baru.");
-        }
-      }, 10000);
+      try {
+        const params = new URLSearchParams({
+          action: "simpan",
+          tps: currentTps,
+          noDpt: targetVoter.noDpt,
+          nama: targetVoter.nama,
+          jk: targetVoter.jk,
+          _t: Date.now()
+        });
+
+        // Kirim data dengan mode 'no-cors' agar tidak pernah diblokir browser mana pun
+        await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, {
+          method: 'GET',
+          mode: 'no-cors',
+          cache: 'no-store'
+        });
+
+        // Tunggu 1.2 detik agar Spreadsheet selesai menulis, lalu tampilkan konfirmasi
+        await new Promise(r => setTimeout(r, 1200));
+
+        showToast('success', `✓ ${targetVoter.nama} (#${targetVoter.noDpt}) tercatat hadir!`);
+        document.getElementById('search-dpt').value = "";
+        resetSelection();
+        renderDropdown(masterDpt);
+
+      } catch (err) {
+        btn.disabled = false;
+        showToast('error', "Gagal mengirim data: " + err.message);
+      } finally {
+        isSubmitting = false;
+        btn.innerText = "CATAT KEHADIRAN";
+      }
+    }
+
 
       window[cbName] = function(data) {
         if (isDone) return;
