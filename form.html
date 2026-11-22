@@ -164,7 +164,7 @@
       }
     }
 
-    async function handleSubmit() {
+    function handleSubmit() {
       if (!selectedVoter || isSubmitting) return;
       isSubmitting = true;
       const btn = document.getElementById('btn-submit');
@@ -172,17 +172,14 @@
       btn.innerText = "MENYIMPAN...";
       document.getElementById('alert-box').classList.add('hidden');
 
-      try {
-        const params = new URLSearchParams({
-          action: "simpan",
-          tps: currentTps,
-          noDpt: selectedVoter.noDpt,
-          nama: selectedVoter.nama,
-          jk: selectedVoter.jk
-        });
+      const cbName = "cb_" + Date.now();
+      const script = document.createElement("script");
 
-        const res = await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`);
-        const data = await res.json();
+      window[cbName] = function(data) {
+        delete window[cbName];
+        script.remove();
+        isSubmitting = false;
+        btn.innerText = "CATAT KEHADIRAN";
 
         if (data.status === 'success') {
           showToast('success', "✓ " + data.message);
@@ -193,13 +190,28 @@
           btn.disabled = false;
           showToast('error', "⚠ " + data.message);
         }
-      } catch (err) {
-        btn.disabled = false;
-        showToast('error', "Gagal terhubung ke server: " + err.message);
-      } finally {
+      };
+
+      script.onerror = function() {
+        delete window[cbName];
+        script.remove();
         isSubmitting = false;
+        btn.disabled = false;
         btn.innerText = "CATAT KEHADIRAN";
-      }
+        showToast('error', "Koneksi terputus. Periksa sinyal internet Anda.");
+      };
+
+      const params = new URLSearchParams({
+        action: "simpan",
+        tps: currentTps,
+        noDpt: selectedVoter.noDpt,
+        nama: selectedVoter.nama,
+        jk: selectedVoter.jk,
+        callback: cbName
+      });
+
+      script.src = `${APPS_SCRIPT_URL}?${params.toString()}`;
+      document.body.appendChild(script);
     }
 
     function logout() {
