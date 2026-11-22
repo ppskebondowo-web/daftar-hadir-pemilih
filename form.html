@@ -209,7 +209,7 @@
       btn.disabled = true;
       btn.innerText = "MENYIMPAN...";
 
-      const currentUrl = window.location.href.split('?')[0];
+      const currentUrl = window.location.href.split('?').at(0);
       const params = new URLSearchParams({
         action: "simpan",
         tps: currentTps,
@@ -228,12 +228,15 @@
     }
 
     initDpt();
-        const urlParams = new URLSearchParams(window.location.search);
+
+    const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('saved')) {
       showToast('success', "✓ " + urlParams.get('saved'));
       window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (urlParams.has('err')) {
+      showToast('error', "⚠ " + urlParams.get('err'));
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
-
   </script>
 </body>
 </html>
