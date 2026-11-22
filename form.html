@@ -222,30 +222,22 @@
           _t: Date.now()
         });
 
-        const url = `${APPS_SCRIPT_URL}?${params.toString()}`;
-
-        // Kirim melalui Image Beacon (tembus perisai privasi browser)
-        await new Promise((resolve) => {
-          const img = new Image();
-          img.onload = resolve;
-          img.onerror = resolve; // Apps Script mengembalikan JSON bukan gambar, jadi onerror tetap berarti server sudah menerima & mengeksekusi permintaan
-          img.src = url;
-          setTimeout(resolve, 2500);
+        await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, {
+          method: 'GET',
+          mode: 'no-cors',
+          cache: 'no-store'
         });
 
-        // Verifikasi langsung ke Spreadsheet apakah data benar-benar masuk
-        const cekRes = await fetch(`${APPS_SCRIPT_URL}?_t=${Date.now()}`);
-        const cekJson = await cekRes.json();
-        const jmlSekarang = (cekJson.rekap && cekJson.rekap[currentTps]) ? cekJson.rekap[currentTps] : 0;
+        await new Promise(r => setTimeout(r, 1000));
 
-        showToast('success', `✓ ${targetVoter.nama} (#${targetVoter.noDpt}) tersimpan! Total hadir ${currentTps}: ${jmlSekarang}`);
+        showToast('success', `✓ ${targetVoter.nama} (#${targetVoter.noDpt}) tercatat hadir!`);
         document.getElementById('search-dpt').value = "";
         resetSelection();
         renderDropdown(masterDpt);
 
       } catch (err) {
         btn.disabled = false;
-        showToast('error', "Gagal memverifikasi Spreadsheet: " + err.message);
+        showToast('error', "Blokir browser terdeteksi. Gunakan Google Chrome.");
       } finally {
         isSubmitting = false;
         btn.innerText = "CATAT KEHADIRAN";
