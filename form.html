@@ -173,19 +173,15 @@
       document.getElementById('alert-box').classList.add('hidden');
 
       try {
-        const res = await fetch(APPS_SCRIPT_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'text/plain;charset=utf-8'
-          },
-          body: JSON.stringify({
-            tps: currentTps,
-            noDpt: selectedVoter.noDpt,
-            nama: selectedVoter.nama,
-            jk: selectedVoter.jk
-          })
+        const params = new URLSearchParams({
+          action: "simpan",
+          tps: currentTps,
+          noDpt: selectedVoter.noDpt,
+          nama: selectedVoter.nama,
+          jk: selectedVoter.jk
         });
-        
+
+        const res = await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`);
         const data = await res.json();
 
         if (data.status === 'success') {
