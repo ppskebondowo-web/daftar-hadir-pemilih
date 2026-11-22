@@ -208,25 +208,18 @@
       const btn = document.getElementById('btn-submit');
       btn.disabled = true;
       btn.innerText = "MENYIMPAN...";
-      hideToast();
 
-      const targetVoter = { ...selectedVoter };
+      const currentUrl = window.location.href.split('?')[0];
+      const params = new URLSearchParams({
+        action: "simpan",
+        tps: currentTps,
+        noDpt: selectedVoter.noDpt,
+        nama: selectedVoter.nama,
+        jk: selectedVoter.jk,
+        redirect: currentUrl
+      });
 
-      const query = `action=simpan&tps=${encodeURIComponent(currentTps)}&noDpt=${encodeURIComponent(targetVoter.noDpt)}&nama=${encodeURIComponent(targetVoter.nama)}&jk=${encodeURIComponent(targetVoter.jk)}&_t=${Date.now()}`;
-      const fullUrl = `${APPS_SCRIPT_URL}?${query}`;
-
-      // Kirim via Image Beacon tanpa menghapus objek sebelum terkirim
-      const beacon = new Image();
-      beacon.src = fullUrl;
-
-      setTimeout(() => {
-        showToast('success', `✓ ${targetVoter.nama} (#${targetVoter.noDpt}) tercatat hadir!`);
-        document.getElementById('search-dpt').value = "";
-        resetSelection();
-        renderDropdown(masterDpt);
-        isSubmitting = false;
-        btn.innerText = "CATAT KEHADIRAN";
-      }, 1500);
+      window.location.href = `${APPS_SCRIPT_URL}?${params.toString()}`;
     }
 
     function logout() {
@@ -235,6 +228,12 @@
     }
 
     initDpt();
+        const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('saved')) {
+      showToast('success', "✓ " + urlParams.get('saved'));
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
   </script>
 </body>
 </html>
