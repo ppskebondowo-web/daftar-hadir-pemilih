@@ -102,9 +102,13 @@
 
         masterDpt = [];
         for (let j = 1; j < lines.length; j++) {
-          const r = lines[j].split(';');
-          if (r.length >= 3 && /^\d+$/.test(r.trim()) && r.trim() !== "") {
-            masterDpt.push({ noDpt: r.trim(), nama: r.trim(), jk: r.trim() });
+          const r = lines.at(j).split(';');
+          if (r.length >= 3 && /^\d+$/.test(r.at(0).trim()) && r.at(0).trim() !== "") {
+            masterDpt.push({ 
+              noDpt: r.at(0).trim(), 
+              nama: r.at(1).trim(), 
+              jk: r.at(2).trim() 
+            });
           }
         }
         document.getElementById('sub-tps').innerText = `Total DPT: ${masterDpt.length} Pemilih`;
