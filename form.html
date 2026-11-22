@@ -4,74 +4,112 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Entri Kehadiran TPS</title>
-  <script src="https://tailwindcss.com"></script>
-  <link href="https://googleapis.com" rel="stylesheet">
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
       background: radial-gradient(circle at top left, #064e3b, #020617 70%);
       color: #f8fafc;
       height: 100dvh;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 14px;
+      max-width: 480px;
+      margin: 0 auto;
     }
     .glass {
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(16px);
+      background: rgba(15, 23, 42, 0.8);
       border: 1px solid rgba(52, 211, 153, 0.25);
+      border-radius: 18px;
+      backdrop-filter: blur(12px);
     }
+    .topbar { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .title-wrap { display: flex; align-items: center; gap: 8px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: #34d399; }
+    h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
+    .sub { font-size: 11px; color: #6ee7b7; margin-top: 2px; }
+    .btn-logout {
+      background: #1e293b; color: #cbd5e1; border: 1px solid #334155;
+      padding: 7px 13px; border-radius: 11px; font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .main-card {
+      flex: 1; min-height: 0; margin: 10px 0; padding: 14px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .search-wrap { position: relative; flex-shrink: 0; }
+    .search-input {
+      width: 100%; padding: 11px 36px 11px 14px; border-radius: 13px;
+      background: #0f172a; border: 1px solid #334155; color: #fff; font-size: 14px; outline: none;
+    }
+    .search-input:focus { border-color: #34d399; }
+    .btn-clear {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: #94a3b8; font-size: 15px; cursor: pointer; padding: 4px;
+    }
+    select {
+      flex: 1; width: 100%; min-height: 0; background: #0f172a; color: #f1f5f9;
+      border: 1px solid #1e293b; border-radius: 13px; padding: 6px; font-size: 14px; outline: none;
+    }
+    option { padding: 8px 10px; border-radius: 8px; }
+    option:checked { background: #059669; color: #fff; font-weight: 600; }
+    .detail-box {
+      background: rgba(6, 78, 59, 0.45); border: 1px solid rgba(52, 211, 153, 0.3);
+      border-radius: 13px; padding: 11px 13px; flex-shrink: 0;
+    }
+    .detail-top { display: flex; justify-content: space-between; align-items: center; }
+    .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #34d399; letter-spacing: 0.5px; }
+    .badge-jk { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+    .detail-name { margin-top: 4px; font-size: 14px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .detail-no { color: #34d399; font-weight: 800; margin-right: 4px; }
+    .footer { flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
+    .alert { padding: 9px 12px; border-radius: 11px; font-size: 12px; font-weight: 600; text-align: center; display: none; }
+    .alert.success { display: block; background: rgba(6, 78, 59, 0.9); border: 1px solid #10b981; color: #a7f3d0; }
+    .alert.error { display: block; background: rgba(127, 29, 29, 0.9); border: 1px solid #f43f5e; color: #fecdd3; }
+    .btn-submit {
+      width: 100%; padding: 14px; border-radius: 14px; border: none;
+      background: linear-gradient(90deg, #10b981, #2dd4bf); color: #022c22;
+      font-size: 14px; font-weight: 800; letter-spacing: 0.5px; cursor: pointer;
+    }
+    .btn-submit:disabled { background: #1e293b; color: #64748b; cursor: not-allowed; }
   </style>
 </head>
-<body class="flex flex-col justify-between p-3.5 max-w-md mx-auto">
+<body>
 
-  <!-- Top Bar Ringkas -->
-  <div class="glass rounded-2xl px-4 py-3 flex items-center justify-between shrink-0">
+  <div class="glass topbar">
     <div>
-      <div class="flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <h1 id="header-tps" class="text-base font-extrabold text-white tracking-wide">MEMUAT...</h1>
+      <div class="title-wrap">
+        <span class="dot"></span>
+        <h1 id="header-tps">MEMUAT...</h1>
       </div>
-      <p id="sub-tps" class="text-[11px] text-emerald-300">Menyiapkan data DPT...</p>
+      <div id="sub-tps" class="sub">Menyiapkan data DPT...</div>
     </div>
-    <button onclick="logout()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-rose-950 text-slate-300 hover:text-rose-300 border border-slate-700 text-xs font-semibold transition">
-      Keluar
-    </button>
+    <button onclick="logout()" class="btn-logout">Keluar</button>
   </div>
 
-  <!-- Kotak Pencarian & Daftar Pemilih (Fleksibel mengisi ruang tengah layar HP) -->
-  <div class="glass rounded-3xl p-4 my-2.5 flex-1 flex flex-col min-h-0">
-    <div class="relative shrink-0 mb-2.5">
-      <input type="text" id="search-dpt" onkeyup="filterDpt()" placeholder="Ketik Nama atau Nomor DPT..."
-        class="w-full pl-4 pr-9 py-2.5 rounded-2xl bg-slate-900/90 border border-slate-700 text-white placeholder-slate-400 text-sm focus:border-emerald-400 outline-none">
-      <button onclick="clearSearch()" class="absolute right-3 top-2.5 text-slate-400 hover:text-white text-sm">✕</button>
+  <div class="glass main-card">
+    <div class="search-wrap">
+      <input type="text" id="search-dpt" onkeyup="filterDpt()" placeholder="Ketik Nama atau Nomor DPT..." class="search-input">
+      <button onclick="clearSearch()" class="btn-clear">✕</button>
     </div>
 
-    <div class="flex-1 min-h-0 flex flex-col">
-      <select id="select-pemilih" size="10" onchange="pilihPemilih()"
-        class="w-full flex-1 bg-slate-900/70 border border-slate-800 rounded-2xl p-2 text-sm text-slate-100 focus:border-emerald-500 outline-none">
-      </select>
-    </div>
+    <select id="select-pemilih" size="10" onchange="pilihPemilih()"></select>
 
-    <!-- Kartu Konfirmasi Pemilih Terpilih -->
-    <div id="detail-box" class="mt-2.5 bg-emerald-950/60 border border-emerald-500/30 rounded-2xl p-3 shrink-0">
-      <div class="flex justify-between items-center">
-        <span class="text-[11px] uppercase tracking-wider text-emerald-400 font-bold">Pemilih Terpilih</span>
-        <span id="det-jk" class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300">-</span>
+    <div class="detail-box">
+      <div class="detail-top">
+        <span class="lbl">Pemilih Terpilih</span>
+        <span id="det-jk" class="badge-jk">-</span>
       </div>
-      <div class="mt-1 flex items-baseline gap-2 truncate">
-        <span id="det-nodpt" class="text-sm font-extrabold text-emerald-400 shrink-0">#-</span>
-        <span id="det-nama" class="text-sm font-bold text-white truncate">Ketuk nama pada daftar di atas</span>
+      <div class="detail-name">
+        <span id="det-nodpt" class="detail-no">#-</span>
+        <span id="det-nama">Ketuk nama pada daftar di atas</span>
       </div>
     </div>
   </div>
 
-  <!-- Notifikasi Singkat & Tombol Simpan Bawah -->
-  <div class="shrink-0 space-y-2">
-    <div id="alert-box" class="hidden px-3.5 py-2 rounded-xl text-xs font-medium border text-center"></div>
-
-    <button onclick="handleSubmit()" id="btn-submit" disabled
-      class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 text-slate-950 font-extrabold text-sm tracking-wide shadow-lg shadow-emerald-500/20 transition active:scale-[0.99]">
-      CATAT KEHADIRAN
-    </button>
+  <div class="footer">
+    <div id="alert-box" class="alert"></div>
+    <button onclick="handleSubmit()" id="btn-submit" disabled class="btn-submit">CATAT KEHADIRAN</button>
   </div>
 
   <script>
@@ -79,19 +117,19 @@
     const GITHUB_BASE = "./";
 
     const currentTps = sessionStorage.getItem("active_tps");
-    if (!currentTps) {
-      window.location.href = "index.html";
-    }
+    if (!currentTps) window.location.href = "index.html";
 
     let masterDpt = [], selectedVoter = null, isSubmitting = false;
-
     document.getElementById('header-tps').innerText = currentTps;
 
     function showToast(type, msg) {
       const box = document.getElementById('alert-box');
-      box.className = "px-3.5 py-2 rounded-xl text-xs font-semibold border text-center block " +
-        (type === 'error' ? "bg-rose-950/80 border-rose-500/40 text-rose-300" : "bg-emerald-950/80 border-emerald-500/40 text-emerald-300");
+      box.className = "alert " + type;
       box.innerText = msg;
+    }
+
+    function hideToast() {
+      document.getElementById('alert-box').className = "alert";
     }
 
     async function initDpt() {
@@ -104,17 +142,13 @@
         for (let j = 1; j < lines.length; j++) {
           const r = lines.at(j).split(';');
           if (r.length >= 3 && /^\d+$/.test(r.at(0).trim()) && r.at(0).trim() !== "") {
-            masterDpt.push({ 
-              noDpt: r.at(0).trim(), 
-              nama: r.at(1).trim(), 
-              jk: r.at(2).trim() 
-            });
+            masterDpt.push({ noDpt: r.at(0).trim(), nama: r.at(1).trim(), jk: r.at(2).trim() });
           }
         }
         document.getElementById('sub-tps').innerText = `Total DPT: ${masterDpt.length} Pemilih`;
         renderDropdown(masterDpt);
       } catch (e) {
-        showToast('error', "Gagal memuat data DPT: " + e.message);
+        showToast('error', "Gagal memuat DPT: " + e.message);
       }
     }
 
@@ -124,7 +158,6 @@
       data.forEach((item, idx) => {
         const opt = document.createElement('option');
         opt.value = idx;
-        opt.className = "py-1.5 px-2 rounded-lg checked:bg-emerald-600 checked:text-white";
         opt.text = `[${item.noDpt}] ${item.nama} (${item.jk})`;
         opt.dataset.nodpt = item.noDpt;
         sel.appendChild(opt);
@@ -160,7 +193,7 @@
         document.getElementById('det-nama').innerText = selectedVoter.nama;
         document.getElementById('det-jk').innerText = selectedVoter.jk === 'L' ? 'Laki-laki' : 'Perempuan';
         document.getElementById('btn-submit').disabled = false;
-        document.getElementById('alert-box').classList.add('hidden');
+        hideToast();
       }
     }
 
@@ -170,12 +203,28 @@
       const btn = document.getElementById('btn-submit');
       btn.disabled = true;
       btn.innerText = "MENYIMPAN...";
-      document.getElementById('alert-box').classList.add('hidden');
+      hideToast();
 
       const cbName = "cb_" + Date.now();
       const script = document.createElement("script");
+      let isDone = false;
+
+      const timer = setTimeout(() => {
+        if (!isDone) {
+          isDone = true;
+          delete window[cbName];
+          script.remove();
+          isSubmitting = false;
+          btn.disabled = false;
+          btn.innerText = "CATAT KEHADIRAN";
+          showToast('error', "Waktu habis (Timeout). Pastikan Code.gs sudah di-deploy Versi Baru.");
+        }
+      }, 10000);
 
       window[cbName] = function(data) {
+        if (isDone) return;
+        isDone = true;
+        clearTimeout(timer);
         delete window[cbName];
         script.remove();
         isSubmitting = false;
@@ -193,12 +242,15 @@
       };
 
       script.onerror = function() {
+        if (isDone) return;
+        isDone = true;
+        clearTimeout(timer);
         delete window[cbName];
         script.remove();
         isSubmitting = false;
         btn.disabled = false;
         btn.innerText = "CATAT KEHADIRAN";
-        showToast('error', "Koneksi terputus. Periksa sinyal internet Anda.");
+        showToast('error', "Gagal memanggil script. Cek koneksi atau perisai browser.");
       };
 
       const params = new URLSearchParams({
