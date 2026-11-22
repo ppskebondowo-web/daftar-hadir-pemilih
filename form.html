@@ -202,7 +202,7 @@
       }
     }
 
-    async function handleSubmit() {
+    function handleSubmit() {
       if (!selectedVoter || isSubmitting) return;
       isSubmitting = true;
       const btn = document.getElementById('btn-submit');
@@ -212,36 +212,51 @@
 
       const targetVoter = { ...selectedVoter };
 
-      try {
-        const params = new URLSearchParams({
-          action: "simpan",
-          tps: currentTps,
-          noDpt: targetVoter.noDpt,
-          nama: targetVoter.nama,
-          jk: targetVoter.jk,
-          _t: Date.now()
-        });
+      // Buat iframe tersembunyi jika belum ada
+      let iframe = document.getElementById('hidden_iframe');
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.name = 'hidden_iframe';
+        iframe.id = 'hidden_iframe';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+      }
 
-        await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, {
-          method: 'GET',
-          mode: 'no-cors',
-          cache: 'no-store'
-        });
+      // Buat form tersembunyi untuk mengirim data langsung ke Apps Script
+      const form = document.createElement('form');
+      form.method = 'GET';
+      form.action = APPS_SCRIPT_URL;
+      form.target = 'hidden_iframe';
 
-        await new Promise(r => setTimeout(r, 1000));
+      const fields = {
+        action: 'simpan',
+        tps: currentTps,
+        noDpt: targetVoter.noDpt,
+        nama: targetVoter.nama,
+        jk: targetVoter.jk,
+        _t: Date.now()
+      };
 
+      for (const [key, val] of Object.entries(fields)) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = val;
+        form.appendChild(input);
+      }
+
+      document.body.appendChild(form);
+      form.submit();
+      form.remove();
+
+      setTimeout(() => {
         showToast('success', `✓ ${targetVoter.nama} (#${targetVoter.noDpt}) tercatat hadir!`);
         document.getElementById('search-dpt').value = "";
         resetSelection();
         renderDropdown(masterDpt);
-
-      } catch (err) {
-        btn.disabled = false;
-        showToast('error', "Blokir browser terdeteksi. Gunakan Google Chrome.");
-      } finally {
         isSubmitting = false;
         btn.innerText = "CATAT KEHADIRAN";
-      }
+      }, 1500);
     }
 
 
