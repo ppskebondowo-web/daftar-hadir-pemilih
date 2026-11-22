@@ -212,42 +212,12 @@
 
       const targetVoter = { ...selectedVoter };
 
-      // Buat iframe tersembunyi jika belum ada
-      let iframe = document.getElementById('hidden_iframe');
-      if (!iframe) {
-        iframe = document.createElement('iframe');
-        iframe.name = 'hidden_iframe';
-        iframe.id = 'hidden_iframe';
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-      }
+      const query = `action=simpan&tps=${encodeURIComponent(currentTps)}&noDpt=${encodeURIComponent(targetVoter.noDpt)}&nama=${encodeURIComponent(targetVoter.nama)}&jk=${encodeURIComponent(targetVoter.jk)}&_t=${Date.now()}`;
+      const fullUrl = `${APPS_SCRIPT_URL}?${query}`;
 
-      // Buat form tersembunyi untuk mengirim data langsung ke Apps Script
-      const form = document.createElement('form');
-      form.method = 'GET';
-      form.action = APPS_SCRIPT_URL;
-      form.target = 'hidden_iframe';
-
-      const fields = {
-        action: 'simpan',
-        tps: currentTps,
-        noDpt: targetVoter.noDpt,
-        nama: targetVoter.nama,
-        jk: targetVoter.jk,
-        _t: Date.now()
-      };
-
-      for (const [key, val] of Object.entries(fields)) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = val;
-        form.appendChild(input);
-      }
-
-      document.body.appendChild(form);
-      form.submit();
-      form.remove();
+      // Kirim via Image Beacon tanpa menghapus objek sebelum terkirim
+      const beacon = new Image();
+      beacon.src = fullUrl;
 
       setTimeout(() => {
         showToast('success', `✓ ${targetVoter.nama} (#${targetVoter.noDpt}) tercatat hadir!`);
@@ -258,7 +228,6 @@
         btn.innerText = "CATAT KEHADIRAN";
       }, 1500);
     }
-
 
     function logout() {
       sessionStorage.removeItem("active_tps");
