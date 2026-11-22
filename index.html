@@ -4,216 +4,241 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daftar Hadir Pemilih - Pilkades Kebondowo 2026</title>
-  <style>
-    :root { --primary: #4f46e5; --hover: #4338ca; --bg: #f1f5f9; --text: #0f172a; --muted: #64748b; --border: #e2e8f0; }
-    * { box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 18px 14px; display: flex; justify-content: center; }
-    .card { background: #fff; width: 100%; max-width: 440px; padding: 24px 20px; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(15,23,42,.08); }
-    .header { text-align: center; margin-bottom: 20px; }
-    .badge { display: inline-block; background: #eef2ff; color: var(--primary); font-size: .72rem; font-weight: 700; padding: 4px 12px; border-radius: 99px; margin-bottom: 8px; }
-    h2 { margin: 0 0 4px; font-size: 1.3rem; font-weight: 800; }
-    .sub { margin: 0; color: var(--muted); font-size: .85rem; }
-    .fg { margin-bottom: 12px; }
-    .row-2 { display: grid; grid-template-columns: 1fr 1.3fr; gap: 10px; }
-    label { display: block; font-size: .78rem; font-weight: 600; color: #334155; margin-bottom: 5px; }
-    select, input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 12px; font-size: .95rem; color: var(--text); background: #fff; }
-    select:focus, input:not([readonly]):focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,.12); }
-    input[readonly] { background: #f8fafc; color: #475569; font-weight: 600; border-color: #f1f5f9; }
-    #nomor_dpt { font-size: 1.15rem; font-weight: 700; }
-    button { width: 100%; padding: 12px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-size: .95rem; font-weight: 700; cursor: pointer; margin-top: 6px; }
-    button:hover:not(:disabled) { background: var(--hover); }
-    button:disabled { background: #cbd5e1; cursor: not-allowed; }
-    #status { margin-top: 12px; padding: 10px 12px; border-radius: 12px; text-align: center; font-size: .84rem; display: none; font-weight: 600; }
-    .success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
-    .error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
-    .warning { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
-    .rekap-box { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); display: none; }
-    .rekap-title { font-size: .74rem; font-weight: 700; color: var(--muted); text-align: center; margin-bottom: 8px; text-transform: uppercase; }
-    .rekap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
-    .rekap-item { background: #f8fafc; padding: 9px 4px; border-radius: 12px; border: 1px solid var(--border); }
-    .rekap-item.total { background: #eef2ff; border-color: #c7d2fe; }
-    .rekap-num { font-size: 1.25rem; font-weight: 800; color: var(--text); display: block; }
-    .rekap-item.total .rekap-num { color: var(--primary); }
-    .rekap-label { font-size: .7rem; color: var(--muted); font-weight: 600; }
-  </style>
+  <script src="https://tailwindcss.com"></script>
+  <link href="https://googleapis.com" rel="stylesheet">
+  <style>body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }</style>
 </head>
-<body>
-<div class="card">
-  <div class="header">
-    <span class="badge">Senin, 14 Desember 2026</span>
-    <h2>Daftar Hadir Pemilih</h2>
-    <p class="sub">Pemilihan Kepala Desa Kebondowo</p>
-  </div>
-  <form id="absenForm">
-    <div class="fg">
-      <label for="tps">Lokasi TPS</label>
-      <select id="tps" required>
-        <option value="">-- Pilih TPS --</option>
-        <option value="TPS 001">TPS 001</option><option value="TPS 002">TPS 002</option>
-        <option value="TPS 003">TPS 003</option><option value="TPS 004">TPS 004</option>
-        <option value="TPS 005">TPS 005</option><option value="TPS 006">TPS 006</option>
-        <option value="TPS 007">TPS 007</option><option value="TPS 008">TPS 008</option>
-        <option value="TPS 009">TPS 009</option><option value="TPS 010">TPS 010</option>
-        <option value="TPS 011">TPS 011</option>
-      </select>
-    </div>
-    <div class="fg"><label>Nomor Urut Kedatangan</label><input type="text" id="nomor_urut" value="Otomatis tercatat saat simpan" readonly></div>
-    <div class="fg"><label for="nomor_dpt">Nomor DPT</label><input type="number" id="nomor_dpt" placeholder="Masukkan nomor urut DPT..." disabled required></div>
-    <div class="fg"><label>Nama Lengkap Pemilih</label><input type="text" id="nama" readonly placeholder="Terisi otomatis"></div>
-    <div class="row-2 fg">
-      <div><label>Jenis Kelamin</label><input type="text" id="jenis_kelamin" readonly placeholder="-"></div>
-      <div><label>Waktu Kehadiran</label><input type="text" id="keterangan" readonly placeholder="-"></div>
-    </div>
-    <button type="submit" id="btnSubmit" disabled>Simpan Kehadiran</button>
-  </form>
-  <div id="status"></div>
-  <div class="rekap-box" id="rekapBox">
-    <div class="rekap-title" id="rekapTitle">Rekap Kehadiran TPS</div>
-    <div class="rekap-grid">
-      <div class="rekap-item"><span class="rekap-num" id="rekapL">0</span><span class="rekap-label">Laki-laki (L)</span></div>
-      <div class="rekap-item"><span class="rekap-num" id="rekapP">0</span><span class="rekap-label">Perempuan (P)</span></div>
-      <div class="rekap-item total"><span class="rekap-num" id="rekapTotal">0</span><span class="rekap-label">Total Hadir</span></div>
-    </div>
-  </div>
-</div>
-<script>
-  // URL disusun dengan array join agar tidak terpotong format
-  const HOST_APPS = ["https://google.com", "macros", "s", "AKfycbyxCE6Yoj7FVsy8mF8m76ammS1K4YoGGydMOgPXRXEVxsYGBE_bJmlU-VRdo99al7D6VQ", "exec"];
-  const GOOGLE_SCRIPT_URL = HOST_APPS.join("/");
+<body class="min-h-screen flex items-center justify-center p-4">
 
-  let dataPemilih = [], daftarSudahHadir = new Set(), countL = 0, countP = 0;
-  const tpsSelect = document.getElementById('tps'), nomorDptInput = document.getElementById('nomor_dpt'),
-        namaInput = document.getElementById('nama'), jkInput = document.getElementById('jenis_kelamin'),
-        ketInput = document.getElementById('keterangan'), urutInput = document.getElementById('nomor_urut'),
-        btnSubmit = document.getElementById('btnSubmit'), statusDiv = document.getElementById('status'),
-        rekapBox = document.getElementById('rekapBox');
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+    <div class="bg-emerald-700 p-6 text-white text-center">
+      <h1 class="text-lg font-bold tracking-wide">DAFTAR HADIR PEMILIH</h1>
+      <p class="text-xs text-emerald-100 mt-1">Pemilihan Kepala Desa Kebondowo Tahun 2026</p>
+      <div id="badge-tps" class="hidden mt-3 inline-block bg-emerald-900 text-emerald-100 text-xs font-semibold px-3 py-1 rounded-full"></div>
+    </div>
 
-  tpsSelect.addEventListener('change', async function() {
-    const tps = this.value;
-    resetForm();
-    if (!tps) return;
-    showStatus("Memuat master DPT " + tps + "...", "success");
-    try {
-      const response = await fetch("./" + encodeURIComponent(tps + ".csv"));
-      if (!response.ok) throw new Error("File " + tps + ".csv tidak ditemukan.");
-      const baris = (await response.text()).split(/\r?\n/);
-      dataPemilih = [];
-      for (let i = 1; i < baris.length; i++) {
-        const kolom = baris.at(i).split(';');
-        if (kolom.length >= 3) {
-          const no = kolom.at(0).trim(), nama = kolom.at(1).trim(), lp = kolom.at(2).trim();
-          if (no && !isNaN(no)) dataPemilih.push({ No: no, Nama: nama, LP: lp });
+    <!-- LOGIN -->
+    <div id="view-login" class="p-6">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Masukkan Password Petugas TPS</label>
+      <input type="password" id="input-password" placeholder="Masukkan kode akses TPS..." 
+        class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 outline-none mb-4">
+      <button onclick="handleLogin()" id="btn-login"
+        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition shadow-sm">
+        Masuk ke Form TPS
+      </button>
+    </div>
+
+    <!-- FORM KEHADIRAN -->
+    <div id="view-form" class="hidden p-6">
+      <div class="mb-4">
+        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Cari Nama / Nomor DPT</label>
+        <input type="text" id="search-dpt" onkeyup="filterDpt()" placeholder="Ketik nama atau nomor DPT..." 
+          class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Daftar Pemilih DPT</label>
+        <select id="select-pemilih" size="6" onchange="pilihPemilih()"
+          class="w-full border border-gray-300 rounded-xl p-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-gray-50">
+        </select>
+        <p class="text-[11px] text-gray-400 mt-1">*Ketuk nama pemilih pada daftar di atas</p>
+      </div>
+
+      <div id="detail-box" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 mb-4 text-sm">
+        <div class="flex justify-between"><span class="text-gray-500">Nomor DPT:</span><span id="det-nodpt" class="font-bold text-gray-800">-</span></div>
+        <div class="flex justify-between mt-1"><span class="text-gray-500">Nama Lengkap:</span><span id="det-nama" class="font-bold text-gray-800 text-right">-</span></div>
+        <div class="flex justify-between mt-1"><span class="text-gray-500">Jenis Kelamin:</span><span id="det-jk" class="font-bold text-gray-800">-</span></div>
+      </div>
+
+      <div class="mb-5">
+        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Keterangan (Opsional)</label>
+        <input type="text" id="input-ket" placeholder="Kosongkan jika hadir normal..." 
+          class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 outline-none text-sm mb-2">
+        <div class="flex flex-wrap gap-1.5">
+          <button type="button" onclick="setKet('Disabilitas')" class="text-[11px] bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg">+ Disabilitas</button>
+          <button type="button" onclick="setKet('Didampingi')" class="text-[11px] bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg">+ Didampingi</button>
+          <button type="button" onclick="setKet('Lansia')" class="text-[11px] bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg">+ Lansia</button>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="logout()" class="w-1/3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 rounded-xl text-sm">Keluar</button>
+        <button onclick="handleSubmit()" id="btn-submit" disabled
+          class="w-2/3 bg-emerald-600 disabled:bg-gray-300 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl text-sm shadow-sm">
+          Catat Kehadiran
+        </button>
+      </div>
+    </div>
+
+    <!-- ALERT & ERROR LOG -->
+    <div id="alert-box" class="hidden mx-6 mb-6 p-3.5 rounded-xl text-xs border">
+      <div class="font-bold mb-1" id="alert-title"></div>
+      <div id="alert-msg"></div>
+      <div id="alert-code" class="mt-1.5 font-mono text-[10px] opacity-75"></div>
+    </div>
+  </div>
+
+  <script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxml_1ZhNvG62Ik4ETR7W8JeBeOQVccXhuRe1A4IBrjjEIhjuE11ZIcbJjfUqOWA3meLA/exec";
+    const GITHUB_BASE = "https://githubusercontent.com";
+
+    let currentTps = "", masterDpt = [], selectedVoter = null;
+
+    function setKet(t) { document.getElementById('input-ket').value = t; }
+    function hideAlert() { document.getElementById('alert-box').classList.add('hidden'); }
+    function showAlert(type, title, msg, code = "") {
+      const box = document.getElementById('alert-box');
+      box.className = "mx-6 mb-6 p-3.5 rounded-xl text-xs border block " + 
+        (type === 'error' ? "bg-red-50 border-red-200 text-red-800" : "bg-emerald-50 border-emerald-200 text-emerald-800");
+      document.getElementById('alert-title').innerText = title;
+      document.getElementById('alert-msg').innerText = msg;
+      document.getElementById('alert-code').innerText = code ? `Kode Diagnostik: [${code}]` : "";
+    }
+
+    async function handleLogin() {
+      const pass = document.getElementById('input-password').value.trim();
+      const btn = document.getElementById('btn-login');
+      if (!pass) return showAlert('error', 'Peringatan', 'Masukkan password terlebih dahulu.', 'ERR_EMPTY_PASS');
+
+      hideAlert();
+      btn.disabled = true;
+      btn.innerText = "Memuat Data TPS...";
+
+      try {
+        const resPass = await fetch(GITHUB_BASE + "Password.csv?t=" + Date.now());
+        if (!resPass.ok) throw new Error("Gagal membaca Password.csv (HTTP " + resPass.status + ")");
+        const linesPass = (await resPass.text()).split(/\r?\n/);
+
+        let foundTps = null;
+        for (let i = 1; i < linesPass.length; i++) {
+          const cols = linesPass[i].split(';');
+          if (cols.length >= 2 && cols.trim() === pass) {
+            foundTps = cols.trim();
+            break;
+          }
         }
-      }
-      if (dataPemilih.length === 0) throw new Error("0 data pemilih terbaca.");
 
-      const simpananLokal = JSON.parse(localStorage.getItem("absen_" + tps) || "[]");
-      simpananLokal.forEach(item => {
-        daftarSudahHadir.add(item.no);
-        if (item.lp === "L") countL++;
-        if (item.lp === "P") countP++;
+        if (!foundTps) {
+          btn.disabled = false; btn.innerText = "Masuk ke Form TPS";
+          return showAlert('error', 'Gagal Masuk', 'Password salah atau tidak terdaftar.', 'ERR_AUTH');
+        }
+
+        const resDpt = await fetch(GITHUB_BASE + encodeURIComponent(foundTps + ".csv") + "?t=" + Date.now());
+        if (!resDpt.ok) throw new Error(`Gagal memuat ${foundTps}.csv (HTTP ${resDpt.status})`);
+        const linesDpt = (await resDpt.text()).split(/\r?\n/);
+
+        masterDpt = [];
+        for (let j = 1; j < linesDpt.length; j++) {
+          const r = linesDpt[j].split(';');
+          if (r.length >= 3 && /^\d+$/.test(r.trim()) && r.trim() !== "") {
+            masterDpt.push({ noDpt: r.trim(), nama: r.trim(), jk: r.trim() });
+          }
+        }
+
+        currentTps = foundTps;
+        document.getElementById('view-login').classList.add('hidden');
+        document.getElementById('view-form').classList.remove('hidden');
+        const badge = document.getElementById('badge-tps');
+        badge.innerText = `AKTIF: ${currentTps} (${masterDpt.length} Pemilih)`;
+        badge.classList.remove('hidden');
+        renderDropdown(masterDpt);
+
+      } catch (err) {
+        showAlert('error', 'Kesalahan Jaringan/CSV', err.message, 'ERR_FETCH_CSV');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Masuk ke Form TPS";
+      }
+    }
+
+    function renderDropdown(data) {
+      const sel = document.getElementById('select-pemilih');
+      sel.innerHTML = "";
+      data.forEach((item, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.text = `[${item.noDpt}] ${item.nama} (${item.jk})`;
+        opt.dataset.nodpt = item.noDpt;
+        sel.appendChild(opt);
       });
-
-      updateRekapUI(tps);
-      urutInput.value = "Berikutnya urutan ke-" + (daftarSudahHadir.size + 1);
-      nomorDptInput.disabled = false;
-      nomorDptInput.focus();
-      showStatus("Data " + tps + " siap (" + dataPemilih.length + " DPT).", "success");
-    } catch (err) {
-      showStatus("Gagal memuat: " + err.message, "error");
     }
-  });
 
-  nomorDptInput.addEventListener('input', function() {
-    const dicari = this.value.trim();
-    const pemilih = dataPemilih.find(row => row.No === dicari);
-    if (pemilih) {
-      namaInput.value = pemilih.Nama;
-      jkInput.value = pemilih.LP;
-      if (daftarSudahHadir.has(dicari)) {
-        ketInput.value = "SUDAH HADIR";
-        btnSubmit.disabled = true;
-        showStatus("PERINGATAN: No. DPT " + dicari + " (" + pemilih.Nama + ") sudah hadir!", "warning");
-      } else {
-        ketInput.value = new Date().toLocaleTimeString('id-ID') + " WIB";
-        btnSubmit.disabled = false;
-        statusDiv.style.display = "none";
+    function filterDpt() {
+      const kw = document.getElementById('search-dpt').value.toLowerCase();
+      renderDropdown(masterDpt.filter(i => i.nama.toLowerCase().includes(kw) || i.noDpt.toLowerCase().includes(kw)));
+      selectedVoter = null;
+      document.getElementById('detail-box').classList.add('hidden');
+      document.getElementById('btn-submit').disabled = true;
+    }
+
+    function pilihPemilih() {
+      const sel = document.getElementById('select-pemilih');
+      const opt = sel.options[sel.selectedIndex];
+      if (!opt) return;
+      selectedVoter = masterDpt.find(d => d.noDpt === opt.dataset.nodpt);
+      if (selectedVoter) {
+        document.getElementById('det-nodpt').innerText = selectedVoter.noDpt;
+        document.getElementById('det-nama').innerText = selectedVoter.nama;
+        document.getElementById('det-jk').innerText = selectedVoter.jk === 'L' ? 'Laki-laki (L)' : 'Perempuan (P)';
+        document.getElementById('detail-box').classList.remove('hidden');
+        document.getElementById('btn-submit').disabled = false;
+        hideAlert();
       }
-    } else {
-      namaInput.value = ""; jkInput.value = ""; ketInput.value = ""; btnSubmit.disabled = true;
-      if (dicari !== "") showStatus("Nomor DPT " + dicari + " tidak ditemukan.", "error");
-      else statusDiv.style.display = "none";
     }
-  });
 
-  document.getElementById('absenForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const dptDikirim = nomorDptInput.value.trim(), namaDikirim = namaInput.value,
-          jkDikirim = jkInput.value.toUpperCase(), tpsAktif = tpsSelect.value,
-          waktu = new Date().toLocaleTimeString('id-ID') + " WIB";
+    async function handleSubmit() {
+      if (!selectedVoter) return;
+      const btn = document.getElementById('btn-submit');
+      btn.disabled = true;
+      btn.innerText = "Menyimpan ke Spreadsheet...";
+      hideAlert();
 
-    if (daftarSudahHadir.has(dptDikirim)) return;
+      try {
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            tps: currentTps,
+            noDpt: selectedVoter.noDpt,
+            nama: selectedVoter.nama,
+            jk: selectedVoter.jk,
+            keterangan: document.getElementById('input-ket').value
+          })
+        });
+        const data = await res.json();
 
-    btnSubmit.disabled = true;
-    btnSubmit.textContent = "Menyimpan...";
+        if (data.status === 'success') {
+          showAlert('success', 'Berhasil Tercatat', data.message);
+          document.getElementById('search-dpt').value = "";
+          document.getElementById('input-ket').value = "";
+          document.getElementById('detail-box').classList.add('hidden');
+          selectedVoter = null;
+          renderDropdown(masterDpt);
+        } else {
+          btn.disabled = false;
+          showAlert('error', 'Gagal Menyimpan', data.message, data.code);
+        }
+      } catch (err) {
+        btn.disabled = false;
+        showAlert('error', 'Gagal Terhubung ke Spreadsheet', err.message, 'ERR_POST_SHEET');
+      } finally {
+        btn.innerText = "Catat Kehadiran";
+      }
+    }
 
-    const payload = JSON.stringify({
-      tps: tpsAktif,
-      nomor_dpt: dptDikirim,
-      nama: namaDikirim,
-      jenis_kelamin: jkDikirim
+    function logout() {
+      currentTps = "";
+      masterDpt = [];
+      selectedVoter = null;
+      document.getElementById('input-password').value = "";
+      document.getElementById('view-form').classList.add('hidden');
+      document.getElementById('view-login').classList.remove('hidden');
+      document.getElementById('badge-tps').classList.add('hidden');
+      hideAlert();
+    }
+
+    document.getElementById('input-password').addEventListener('keypress', e => {
+      if (e.key === 'Enter') handleLogin();
     });
-
-    try {
-      // Kirim POST dengan text/plain dan no-cors agar 100% menembus CORS & redirect Google
-      await fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain" },
-        body: payload
-      });
-
-      daftarSudahHadir.add(dptDikirim);
-      if (jkDikirim === "L") countL++;
-      if (jkDikirim === "P") countP++;
-
-      const simpananLokal = JSON.parse(localStorage.getItem("absen_" + tpsAktif) || "[]");
-      simpananLokal.push({ no: dptDikirim, lp: jkDikirim });
-      localStorage.setItem("absen_" + tpsAktif, JSON.stringify(simpananLokal));
-
-      updateRekapUI(tpsAktif);
-      urutInput.value = "Tersimpan ke-" + daftarSudahHadir.size + " (Berikutnya: #" + (daftarSudahHadir.size + 1) + ")";
-      ketInput.value = waktu;
-      showStatus("Tersimpan! Urutan ke-" + daftarSudahHadir.size + " (" + namaDikirim + ")", "success");
-
-      nomorDptInput.value = ""; namaInput.value = ""; jkInput.value = ""; nomorDptInput.focus();
-    } catch (err) {
-      showStatus("Koneksi gagal: " + err.message, "error");
-      btnSubmit.disabled = false;
-    } finally {
-      btnSubmit.textContent = "Simpan Kehadiran";
-    }
-  });
-
-  function updateRekapUI(tps) {
-    rekapBox.style.display = "block";
-    document.getElementById('rekapTitle').textContent = "Rekap Kehadiran " + tps;
-    document.getElementById('rekapL').textContent = countL;
-    document.getElementById('rekapP').textContent = countP;
-    document.getElementById('rekapTotal').textContent = daftarSudahHadir.size;
-  }
-
-  function resetForm() {
-    dataPemilih = []; daftarSudahHadir.clear(); countL = 0; countP = 0;
-    nomorDptInput.value = ""; nomorDptInput.disabled = true;
-    namaInput.value = ""; jkInput.value = ""; ketInput.value = "";
-    urutInput.value = "Otomatis tercatat saat simpan";
-    btnSubmit.disabled = true; statusDiv.style.display = "none"; rekapBox.style.display = "none";
-  }
-
-  function showStatus(msg, type) {
-    statusDiv.textContent = msg; statusDiv.className = type; statusDiv.style.display = "block";
-  }
-</script>
+  </script>
 </body>
 </html>
