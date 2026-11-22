@@ -103,9 +103,9 @@
 
         let foundTps = null;
         for (let i = 1; i < lines.length; i++) {
-          const cols = lines[i].split(';');
-          if (cols.length >= 2 && cols.trim() === pass) {
-            foundTps = cols.trim();
+          const cols = lines.at(i).split(';');
+          if (cols.length >= 2 && cols.at(0).trim() === pass) {
+            foundTps = cols.at(1).trim();
             break;
           }
         }
@@ -116,7 +116,6 @@
           return showError("Password tidak valid.");
         }
 
-        // Simpan sesi TPS & pindah ke halaman form.html
         sessionStorage.setItem("active_tps", foundTps);
         window.location.href = "form.html";
 
