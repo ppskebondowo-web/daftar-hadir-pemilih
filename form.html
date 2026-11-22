@@ -111,13 +111,14 @@
     <div id="alert-box" class="alert"></div>
     <button onclick="handleSubmit()" id="btn-submit" disabled class="btn-submit">CATAT KEHADIRAN</button>
   </div>
-
   <script>
     const APPS_SCRIPT_URL = "https://google.com";
     const GITHUB_BASE = "./";
 
     const currentTps = sessionStorage.getItem("active_tps");
-    if (!currentTps) window.location.href = "index.html";
+    if (!currentTps) {
+      window.location.href = "index.html";
+    }
 
     let masterDpt = [], selectedVoter = null, isSubmitting = false;
     document.getElementById('header-tps').innerText = currentTps;
@@ -142,7 +143,11 @@
         for (let j = 1; j < lines.length; j++) {
           const r = lines.at(j).split(';');
           if (r.length >= 3 && /^\d+$/.test(r.at(0).trim()) && r.at(0).trim() !== "") {
-            masterDpt.push({ noDpt: r.at(0).trim(), nama: r.at(1).trim(), jk: r.at(2).trim() });
+            masterDpt.push({
+              noDpt: r.at(0).trim(),
+              nama: r.at(1).trim(),
+              jk: r.at(2).trim()
+            });
           }
         }
         document.getElementById('sub-tps').innerText = `Total DPT: ${masterDpt.length} Pemilih`;
@@ -217,14 +222,12 @@
           _t: Date.now()
         });
 
-        // Kirim data dengan mode 'no-cors' agar tidak pernah diblokir browser mana pun
         await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, {
           method: 'GET',
           mode: 'no-cors',
           cache: 'no-store'
         });
 
-        // Tunggu 1.2 detik agar Spreadsheet selesai menulis, lalu tampilkan konfirmasi
         await new Promise(r => setTimeout(r, 1200));
 
         showToast('success', `✓ ${targetVoter.nama} (#${targetVoter.noDpt}) tercatat hadir!`);
@@ -239,52 +242,6 @@
         isSubmitting = false;
         btn.innerText = "CATAT KEHADIRAN";
       }
-    }
-
-
-      window[cbName] = function(data) {
-        if (isDone) return;
-        isDone = true;
-        clearTimeout(timer);
-        delete window[cbName];
-        script.remove();
-        isSubmitting = false;
-        btn.innerText = "CATAT KEHADIRAN";
-
-        if (data.status === 'success') {
-          showToast('success', "✓ " + data.message);
-          document.getElementById('search-dpt').value = "";
-          resetSelection();
-          renderDropdown(masterDpt);
-        } else {
-          btn.disabled = false;
-          showToast('error', "⚠ " + data.message);
-        }
-      };
-
-      script.onerror = function() {
-        if (isDone) return;
-        isDone = true;
-        clearTimeout(timer);
-        delete window[cbName];
-        script.remove();
-        isSubmitting = false;
-        btn.disabled = false;
-        btn.innerText = "CATAT KEHADIRAN";
-        showToast('error', "Gagal memanggil script. Cek koneksi atau perisai browser.");
-      };
-
-      const params = new URLSearchParams({
-        action: "simpan",
-        tps: currentTps,
-        noDpt: selectedVoter.noDpt,
-        nama: selectedVoter.nama,
-        jk: selectedVoter.jk,
-        callback: cbName
-      });
-
-      script.src = `${APPS_SCRIPT_URL}?${params.toString()}`;
-      document.body.appendChild(script);
     }
 
     function logout() {
