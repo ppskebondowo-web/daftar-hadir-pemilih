@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Entri Kehadiran TPS</title>
+  <script src="https://tailwindcss.com"></script>
+  <link href="https://googleapis.com" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at top left, #064e3b, #020617 70%);
+      color: #f8fafc;
+      height: 100dvh;
+      overflow: hidden;
+    }
+    .glass {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+    }
+  </style>
+</head>
+<body class="flex flex-col justify-between p-3.5 max-w-md mx-auto">
+
+  <!-- Top Bar Ringkas -->
+  <div class="glass rounded-2xl px-4 py-3 flex items-center justify-between shrink-0">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <h1 id="header-tps" class="text-base font-extrabold text-white tracking-wide">MEMUAT...</h1>
+      </div>
+      <p id="sub-tps" class="text-[11px] text-emerald-300">Menyiapkan data DPT...</p>
+    </div>
+    <button onclick="logout()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-rose-950 text-slate-300 hover:text-rose-300 border border-slate-700 text-xs font-semibold transition">
+      Keluar
+    </button>
+  </div>
+
+  <!-- Kotak Pencarian & Daftar Pemilih (Fleksibel mengisi ruang tengah layar HP) -->
+  <div class="glass rounded-3xl p-4 my-2.5 flex-1 flex flex-col min-h-0">
+    <div class="relative shrink-0 mb-2.5">
+      <input type="text" id="search-dpt" onkeyup="filterDpt()" placeholder="Ketik Nama atau Nomor DPT..."
+        class="w-full pl-4 pr-9 py-2.5 rounded-2xl bg-slate-900/90 border border-slate-700 text-white placeholder-slate-400 text-sm focus:border-emerald-400 outline-none">
+      <button onclick="clearSearch()" class="absolute right-3 top-2.5 text-slate-400 hover:text-white text-sm">✕</button>
+    </div>
+
+    <div class="flex-1 min-h-0 flex flex-col">
+      <select id="select-pemilih" size="10" onchange="pilihPemilih()"
+        class="w-full flex-1 bg-slate-900/70 border border-slate-800 rounded-2xl p-2 text-sm text-slate-100 focus:border-emerald-500 outline-none">
+      </select>
+    </div>
+
+    <!-- Kartu Konfirmasi Pemilih Terpilih -->
+    <div id="detail-box" class="mt-2.5 bg-emerald-950/60 border border-emerald-500/30 rounded-2xl p-3 shrink-0">
+      <div class="flex justify-between items-center">
+        <span class="text-[11px] uppercase tracking-wider text-emerald-400 font-bold">Pemilih Terpilih</span>
+        <span id="det-jk" class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300">-</span>
+      </div>
+      <div class="mt-1 flex items-baseline gap-2 truncate">
+        <span id="det-nodpt" class="text-sm font-extrabold text-emerald-400 shrink-0">#-</span>
+        <span id="det-nama" class="text-sm font-bold text-white truncate">Ketuk nama pada daftar di atas</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifikasi Singkat & Tombol Simpan Bawah -->
+  <div class="shrink-0 space-y-2">
+    <div id="alert-box" class="hidden px-3.5 py-2 rounded-xl text-xs font-medium border text-center"></div>
+
+    <button onclick="handleSubmit()" id="btn-submit" disabled
+      class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 text-slate-950 font-extrabold text-sm tracking-wide shadow-lg shadow-emerald-500/20 transition active:scale-[0.99]">
+      CATAT KEHADIRAN
+    </button>
+  </div>
+
+  <script>
+    const APPS_SCRIPT_URL = "https://google.com";
+    const GITHUB_BASE = "./";
+
+    const currentTps = sessionStorage.getItem("active_tps");
+    if (!currentTps) {
+      window.location.href = "index.html";
+    }
+
+    let masterDpt = [], selectedVoter = null, isSubmitting = false;
+
+    document.getElementById('header-tps').innerText = currentTps;
+
+    function showToast(type, msg) {
+      const box = document.getElementById('alert-box');
+      box.className = "px-3.5 py-2 rounded-xl text-xs font-semibold border text-center block " +
+        (type === 'error' ? "bg-rose-950/80 border-rose-500/40 text-rose-300" : "bg-emerald-950/80 border-emerald-500/40 text-emerald-300");
+      box.innerText = msg;
+    }
+
+    async function initDpt() {
+      try {
+        const res = await fetch(GITHUB_BASE + encodeURIComponent(currentTps + ".csv") + "?t=" + Date.now());
+        if (!res.ok) throw new Error("Gagal memuat file DPT");
+        const lines = (await res.text()).split(/\r?\n/);
+
+        masterDpt = [];
+        for (let j = 1; j < lines.length; j++) {
+          const r = lines[j].split(';');
+          if (r.length >= 3 && /^\d+$/.test(r.trim()) && r.trim() !== "") {
+            masterDpt.push({ noDpt: r.trim(), nama: r.trim(), jk: r.trim() });
+          }
+        }
+        document.getElementById('sub-tps').innerText = `Total DPT: ${masterDpt.length} Pemilih`;
+        renderDropdown(masterDpt);
+      } catch (e) {
+        showToast('error', "Gagal memuat data DPT: " + e.message);
+      }
+    }
+
+    function renderDropdown(data) {
+      const sel = document.getElementById('select-pemilih');
+      sel.innerHTML = "";
+      data.forEach((item, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.className = "py-1.5 px-2 rounded-lg checked:bg-emerald-600 checked:text-white";
+        opt.text = `[${item.noDpt}] ${item.nama} (${item.jk})`;
+        opt.dataset.nodpt = item.noDpt;
+        sel.appendChild(opt);
+      });
+    }
+
+    function filterDpt() {
+      const kw = document.getElementById('search-dpt').value.toLowerCase();
+      renderDropdown(masterDpt.filter(i => i.nama.toLowerCase().includes(kw) || i.noDpt.toLowerCase().includes(kw)));
+      resetSelection();
+    }
+
+    function clearSearch() {
+      document.getElementById('search-dpt').value = "";
+      filterDpt();
+    }
+
+    function resetSelection() {
+      selectedVoter = null;
+      document.getElementById('det-nodpt').innerText = "#-";
+      document.getElementById('det-nama').innerText = "Ketuk nama pada daftar di atas";
+      document.getElementById('det-jk').innerText = "-";
+      document.getElementById('btn-submit').disabled = true;
+    }
+
+    function pilihPemilih() {
+      const sel = document.getElementById('select-pemilih');
+      const opt = sel.options[sel.selectedIndex];
+      if (!opt) return;
+      selectedVoter = masterDpt.find(d => d.noDpt === opt.dataset.nodpt);
+      if (selectedVoter) {
+        document.getElementById('det-nodpt').innerText = `#${selectedVoter.noDpt}`;
+        document.getElementById('det-nama').innerText = selectedVoter.nama;
+        document.getElementById('det-jk').innerText = selectedVoter.jk === 'L' ? 'Laki-laki' : 'Perempuan';
+        document.getElementById('btn-submit').disabled = false;
+        document.getElementById('alert-box').classList.add('hidden');
+      }
+    }
+
+    async function handleSubmit() {
+      if (!selectedVoter || isSubmitting) return;
+      isSubmitting = true;
+      const btn = document.getElementById('btn-submit');
+      btn.disabled = true;
+      btn.innerText = "MENYIMPAN...";
+      document.getElementById('alert-box').classList.add('hidden');
+
+      try {
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            tps: currentTps,
+            noDpt: selectedVoter.noDpt,
+            nama: selectedVoter.nama,
+            jk: selectedVoter.jk
+          })
+        });
+        const data = await res.json();
+
+        if (data.status === 'success') {
+          showToast('success', "✓ " + data.message);
+          document.getElementById('search-dpt').value = "";
+          resetSelection();
+          renderDropdown(masterDpt);
+        } else {
+          btn.disabled = false;
+          showToast('error', "⚠ " + data.message);
+        }
+      } catch (err) {
+        btn.disabled = false;
+        showToast('error', "Gagal terhubung ke server.");
+      } finally {
+        isSubmitting = false;
+        btn.innerText = "CATAT KEHADIRAN";
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem("active_tps");
+      window.location.href = "index.html";
+    }
+
+    initDpt();
+  </script>
+</body>
+</html>
