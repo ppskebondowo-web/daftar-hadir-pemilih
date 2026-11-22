@@ -112,14 +112,15 @@
         let foundTps = null;
         for (let i = 1; i < linesPass.length; i++) {
           const cols = linesPass[i].split(';');
-          if (cols.length >= 2 && cols.trim() === pass) {
-            foundTps = cols.trim();
+          if (cols.length >= 2 && cols[0].trim() === pass) {
+            foundTps = cols[1].trim();
             break;
           }
         }
 
         if (!foundTps) {
-          btn.disabled = false; btn.innerText = "Masuk ke Form TPS";
+          btn.disabled = false; 
+          btn.innerText = "Masuk ke Form TPS";
           return showAlert('error', 'Gagal Masuk', 'Password salah atau tidak terdaftar.', 'ERR_AUTH');
         }
 
@@ -130,8 +131,12 @@
         masterDpt = [];
         for (let j = 1; j < linesDpt.length; j++) {
           const r = linesDpt[j].split(';');
-          if (r.length >= 3 && /^\d+$/.test(r.trim()) && r.trim() !== "") {
-            masterDpt.push({ noDpt: r.trim(), nama: r.trim(), jk: r.trim() });
+          if (r.length >= 3 && /^\d+$/.test(r[0].trim()) && r[1].trim() !== "") {
+            masterDpt.push({ 
+              noDpt: r[0].trim(), 
+              nama: r[1].trim(), 
+              jk: r[2].trim() 
+            });
           }
         }
 
