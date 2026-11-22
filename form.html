@@ -112,7 +112,7 @@
     <button onclick="handleSubmit()" id="btn-submit" disabled class="btn-submit">CATAT KEHADIRAN</button>
   </div>
   <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxml_1ZhNvG62Ik4ETR7W8JeBeOQVccXhuRe1A4IBrjjEIhjuE11ZIcbJjfUqOWA3meLA/exec";
+    const APPS_SCRIPT_URL = "https://google.com";
     const GITHUB_BASE = "./";
 
     const currentTps = sessionStorage.getItem("active_tps");
@@ -202,24 +202,43 @@
       }
     }
 
-    function handleSubmit() {
+    async function handleSubmit() {
       if (!selectedVoter || isSubmitting) return;
       isSubmitting = true;
       const btn = document.getElementById('btn-submit');
       btn.disabled = true;
       btn.innerText = "MENYIMPAN...";
+      hideToast();
 
-      const currentUrl = window.location.href.split('?').at(0);
-      const params = new URLSearchParams({
-        action: "simpan",
-        tps: currentTps,
-        noDpt: selectedVoter.noDpt,
-        nama: selectedVoter.nama,
-        jk: selectedVoter.jk,
-        redirect: currentUrl
-      });
+      try {
+        const params = new URLSearchParams({
+          action: "simpan",
+          tps: currentTps,
+          noDpt: selectedVoter.noDpt,
+          nama: selectedVoter.nama,
+          jk: selectedVoter.jk,
+          _t: Date.now()
+        });
 
-      window.location.href = `${APPS_SCRIPT_URL}?${params.toString()}`;
+        const res = await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`);
+        const data = await res.json();
+
+        if (data.status === 'success') {
+          showToast('success', "✓ " + data.message);
+          document.getElementById('search-dpt').value = "";
+          resetSelection();
+          renderDropdown(masterDpt);
+        } else {
+          btn.disabled = false;
+          showToast('error', "⚠ " + data.message);
+        }
+      } catch (err) {
+        btn.disabled = false;
+        showToast('error', "Gagal terhubung ke server: " + err.message);
+      } finally {
+        isSubmitting = false;
+        btn.innerText = "CATAT KEHADIRAN";
+      }
     }
 
     function logout() {
@@ -228,15 +247,6 @@
     }
 
     initDpt();
-
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('saved')) {
-      showToast('success', "✓ " + urlParams.get('saved'));
-      window.history.replaceState({}, document.title, window.location.pathname);
-    } else if (urlParams.has('err')) {
-      showToast('error', "⚠ " + urlParams.get('err'));
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
   </script>
 </body>
 </html>
