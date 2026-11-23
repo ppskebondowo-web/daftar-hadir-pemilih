@@ -134,7 +134,9 @@
           }
         }
         dataHadir.reverse();
-        document.getElementById('count-hadir').innerText = `Total Hadir: ${dataHadir.length} Pemilih`;
+        const hadirL = dataHadir.filter(item => item.jk.toUpperCase() === 'L').length;
+        const hadirP = dataHadir.filter(item => item.jk.toUpperCase() === 'P').length;
+        document.getElementById('count-hadir').innerText = `Hadir: ${dataHadir.length} (L: ${hadirL} | P: ${hadirP})`;
         renderTable(dataHadir);
       } catch (err) {
         document.getElementById('count-hadir').innerText = "Gagal memuat data";
