@@ -113,7 +113,7 @@
       btn.innerText = "...";
       try {
         const query = encodeURIComponent("SELECT A, B, C, D, E OFFSET 7");
-        const domain = "https://docs." + "://google.com/";
+        const domain = "https://docs." + ":google.com/";
         const sheetId = "1z-oMimZ1X37aKE4YplJWeHF568e7-L3IMpUyqBsn97I";
         const url = domain + sheetId + "/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent(currentTps) + "&tq=" + query + "&t=" + Date.now();
         const res = await fetch(url);
