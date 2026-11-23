@@ -95,12 +95,11 @@
     document.getElementById('title-tps').innerText = `HADIR • ${currentTps}`;
     let dataHadir = [];
 
-    // Parsing baris CSV yang aman terhadap tanda koma
     function parseCsvLine(line) {
       const result = [];
       let cur = '', inQuotes = false;
       for (let i = 0; i < line.length; i++) {
-        const ch = line[i];
+        const ch = line.at(i);
         if (ch === '"') {
           inQuotes = !inQuotes;
         } else if (ch === ',' && !inQuotes) {
@@ -120,7 +119,6 @@
       btn.innerText = "...";
 
       try {
-        // Ambil kolom A s.d E mulai baris 9 ke bawah melalui Google Visualization API
         const query = encodeURIComponent("SELECT A, B, C, D, E OFFSET 7");
         const url = `https://google.com{SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(currentTps)}&tq=${query}&t=${Date.now()}`;
         
@@ -132,7 +130,6 @@
         dataHadir = [];
         for (let i = 0; i < lines.length; i++) {
           const cols = parseCsvLine(lines.at(i));
-          // Pastikan kolom No (A) & Nama (C) terisi valid
           if (cols.length >= 4 && /^\d+$/.test(cols.at(0)) && cols.at(2) !== "") {
             dataHadir.push({
               no: cols.at(0),
@@ -144,7 +141,6 @@
           }
         }
 
-        // Urutkan dari yang terbaru hadir di paling atas
         dataHadir.reverse();
         document.getElementById('count-hadir').innerText = `Total Hadir: ${dataHadir.length} Pemilih`;
         renderTable(dataHadir);
