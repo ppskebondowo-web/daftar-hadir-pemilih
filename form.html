@@ -19,7 +19,7 @@
       margin: 0 auto;
     }
     .glass {
-      background: rgba(15, 23, 42, 0.8);
+      background: rgba(15, 23, 42, 0.85);
       border: 1px solid rgba(52, 211, 153, 0.25);
       border-radius: 18px;
       backdrop-filter: blur(12px);
@@ -28,7 +28,12 @@
     .title-wrap { display: flex; align-items: center; gap: 8px; }
     .dot { width: 9px; height: 9px; border-radius: 50%; background: #34d399; }
     h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
-    .sub { font-size: 11px; color: #6ee7b7; margin-top: 2px; }
+    .sub { font-size: 11px; color: #6ee7b7; margin-top: 2px; font-weight: 600; }
+    .btn-group { display: flex; gap: 6px; }
+    .btn-lihat {
+      background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(52, 211, 153, 0.4);
+      padding: 7px 11px; border-radius: 11px; font-size: 12px; font-weight: 700; text-decoration: none;
+    }
     .btn-logout {
       background: #1e293b; color: #cbd5e1; border: 1px solid #334155;
       padding: 7px 13px; border-radius: 11px; font-size: 12px; font-weight: 600; cursor: pointer;
@@ -84,8 +89,8 @@
       </div>
       <div id="sub-tps" class="sub">Menyiapkan data DPT...</div>
     </div>
-    <div style="display: flex; gap: 6px;">
-      <a href="hadir.html" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(52, 211, 153, 0.4); padding: 7px 11px; border-radius: 11px; font-size: 12px; font-weight: 700; text-decoration: none;">Lihat Hadir</a>
+    <div class="btn-group">
+      <a href="hadir.html" class="btn-lihat">Lihat Hadir</a>
       <button onclick="logout()" class="btn-logout">Keluar</button>
     </div>
   </div>
@@ -115,7 +120,7 @@
     <button onclick="handleSubmit()" id="btn-submit" disabled class="btn-submit">CATAT KEHADIRAN</button>
   </div>
   <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxml_1ZhNvG62Ik4ETR7W8JeBeOQVccXhuRe1A4IBrjjEIhjuE11ZIcbJjfUqOWA3meLA/exec";
+    const APPS_SCRIPT_URL = "https://google.com";
     const GITHUB_BASE = "./";
 
     const currentTps = sessionStorage.getItem("active_tps");
@@ -153,18 +158,11 @@
             });
           }
         }
-        
+
         const jmlL = masterDpt.filter(item => item.jk === 'L').length;
         const jmlP = masterDpt.filter(item => item.jk === 'P').length;
-        
-        document.getElementById('sub-tps').innerText = `DPT: ${masterDpt.length} (L: ${jmlL} | P: ${jmlP})`;
-        renderDropdown(masterDpt);
-      } catch (e) {
-        showToast('error', "Gagal memuat DPT: " + e.message);
-      }
-    }
 
-        document.getElementById('sub-tps').innerText = `Total DPT: ${masterDpt.length} Pemilih`;
+        document.getElementById('sub-tps').innerText = `DPT: ${masterDpt.length} (L: ${jmlL} | P: ${jmlP})`;
         renderDropdown(masterDpt);
       } catch (e) {
         showToast('error', "Gagal memuat DPT: " + e.message);
