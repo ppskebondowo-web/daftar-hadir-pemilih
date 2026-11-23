@@ -310,7 +310,7 @@
     async function getSheetHadirCount(tpsName) {
       try {
         const query = encodeURIComponent("SELECT A, B, C, D, E OFFSET 0");
-        const domain = "https://google.com";
+        const domain = "https://docs.google.com/spreadsheets/d/";
         const sheetId = "1c8FXsD2PT_bqXe3eIoO7jceb2DZeMwfEcrMgp55K-nw";
         const url = domain + sheetId + "/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent(tpsName) + "&tq=" + query + "&t=" + Date.now();
         
