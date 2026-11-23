@@ -309,15 +309,25 @@
 
     async function getSheetHadirCount(tpsName) {
       try {
-        const query = encodeURIComponent("SELECT COUNT(C) WHERE A IS NOT NULL LABEL COUNT(C) ''");
+        const query = encodeURIComponent("SELECT A, C");
         const gvizPath = ["https:", "", "://google.com", "spread" + "sheets", "d", SHEET_ID, "gviz", "tq"].join("/");
         const url = `${gvizPath}?tqx=out:csv&sheet=${encodeURIComponent(tpsName)}&tq=${query}&t=${Date.now()}`;
+        
         const res = await fetch(url);
         if (!res.ok) return 0;
-        const txt = (await res.text()).replace(/"/g, '').trim();
-        const num = parseInt(txt, 10);
-        // Kurangi 1 jika header kolom "Nama" ikut terhitung
-        return isNaN(num) ? 0 : Math.max(0, num - 1);
+        const text = await res.text();
+        const lines = text.split(/\r?\n/);
+
+        let count = 0;
+        for (let i = 0; i < lines.length; i++) {
+          const cleanLine = lines.at(i).replace(/"/g, '').trim();
+          const cols = cleanLine.split(',');
+          // Hitung hanya baris yang kolom A berupa angka dan kolom C (Nama) tidak kosong
+          if (cols.length >= 2 && /^\d+$/.test(cols.at(0).trim()) && cols.at(1).trim() !== "") {
+            count++;
+          }
+        }
+        return count;
       } catch (e) {
         return 0;
       }
