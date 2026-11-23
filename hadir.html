@@ -120,8 +120,7 @@
 
       try {
         const query = encodeURIComponent("SELECT A, B, C, D, E OFFSET 7");
-        const url = `https://google.com{SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(currentTps)}&tq=${query}&t=${Date.now()}`;
-        
+        const url = "https://google.com" + encodeURIComponent(currentTps) + "&tq=" + query + "&t=" + Date.now();     
         const res = await fetch(url);
         if (!res.ok) throw new Error("Gagal akses Spreadsheet (HTTP " + res.status + ")");
         const text = await res.text();
