@@ -235,12 +235,12 @@
       }
     }
     function toggleFullscreen() {
-  const elem = document.documentElement;
-  if (!document.fullscreenElement) {
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen().catch(() => {});
+      const elem = document.documentElement;
+      if (!document.fullscreenElement) {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(() => {});
     } else if (elem.webkitRequestFullscreen) {
-      elem.webkitRequestFullscreen();
+        elem.webkitRequestFullscreen();
     }
   } else {
     if (document.exitFullscreen) {
