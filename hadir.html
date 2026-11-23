@@ -112,7 +112,7 @@
       const tbody = document.getElementById('tbody-hadir');
       btn.innerText = "...";
       try {
-        const query = encodeURIComponent("SELECT A, B, C, D, E OFFSET 7");
+        const query = encodeURIComponent("SELECT A, B, C, D, E OFFSET 2");
         const domain = "https://docs.google.com/spreadsheets/d/";
         const sheetId = "1c8FXsD2PT_bqXe3eIoO7jceb2DZeMwfEcrMgp55K-nw";
         const url = domain + sheetId + "/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent(currentTps) + "&tq=" + query + "&t=" + Date.now();
