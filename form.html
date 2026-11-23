@@ -149,10 +149,21 @@
             masterDpt.push({
               noDpt: r.at(0).trim(),
               nama: r.at(1).trim(),
-              jk: r.at(2).trim()
+              jk: r.at(2).trim().toUpperCase()
             });
           }
         }
+        
+        const jmlL = masterDpt.filter(item => item.jk === 'L').length;
+        const jmlP = masterDpt.filter(item => item.jk === 'P').length;
+        
+        document.getElementById('sub-tps').innerText = `DPT: ${masterDpt.length} (L: ${jmlL} | P: ${jmlP})`;
+        renderDropdown(masterDpt);
+      } catch (e) {
+        showToast('error', "Gagal memuat DPT: " + e.message);
+      }
+    }
+
         document.getElementById('sub-tps').innerText = `Total DPT: ${masterDpt.length} Pemilih`;
         renderDropdown(masterDpt);
       } catch (e) {
