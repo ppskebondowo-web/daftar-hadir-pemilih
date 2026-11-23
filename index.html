@@ -199,6 +199,7 @@
         <div>
           <div class="admin-title">Monitoring Panitia</div>
           <div class="admin-sub" id="admin-summary">Menghitung partisipasi...</div>
+           <div id="live-clock" style="font-size: 11px; color: #34d399; font-weight: 700; margin-top: 3px;">Memuat waktu...</div>
         </div>
         <div class="admin-actions">
           <button onclick="loadAdminPanel()" id="btn-ref-admin" class="btn-sm">↻</button>
@@ -395,6 +396,22 @@
     if (sessionStorage.getItem("is_admin") === "true") {
       activateAdminMode();
     }
+        function updateClock() {
+      const now = new Date();
+      const tgl = now.toLocaleDateString('id-ID', {
+        weekday: 'long', day: 'numeric', month: 'short', year: 'numeric'
+      });
+      const jam = now.toLocaleTimeString('id-ID', {
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+      }).replace(/\./g, ':');
+      
+      const clockEl = document.getElementById('live-clock');
+      if (clockEl) {
+        clockEl.innerText = `${tgl} • ${jam} WIB`;
+      }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
   </script>
 </body>
 </html>
