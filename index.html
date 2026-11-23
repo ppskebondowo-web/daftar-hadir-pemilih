@@ -309,21 +309,21 @@
 
     async function getSheetHadirCount(tpsName) {
       try {
-        const query = encodeURIComponent("SELECT A, C");
-        const gvizPath = ["https:", "", "://google.com", "spread" + "sheets", "d", SHEET_ID, "gviz", "tq"].join("/");
-        const url = `${gvizPath}?tqx=out:csv&sheet=${encodeURIComponent(tpsName)}&tq=${query}&t=${Date.now()}`;
+        const query = encodeURIComponent("SELECT A, B, C, D, E OFFSET 0");
+        const domain = "https://google.com";
+        const sheetId = "1c8FXsD2PT_bqXe3eIoO7jceb2DZeMwfEcrMgp55K-nw";
+        const url = domain + sheetId + "/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent(tpsName) + "&tq=" + query + "&t=" + Date.now();
         
         const res = await fetch(url);
         if (!res.ok) return 0;
         const text = await res.text();
-        const lines = text.split(/\r?\n/);
+        const lines = text.split(/\r?\n/).filter(l => l.trim() !== "");
 
         let count = 0;
         for (let i = 0; i < lines.length; i++) {
-          const cleanLine = lines.at(i).replace(/"/g, '').trim();
-          const cols = cleanLine.split(',');
-          // Hitung hanya baris yang kolom A berupa angka dan kolom C (Nama) tidak kosong
-          if (cols.length >= 2 && /^\d+$/.test(cols.at(0).trim()) && cols.at(1).trim() !== "") {
+          // Ambil nilai kolom A (No) dan kolom C (Nama) dengan membersihkan tanda kutip CSV
+          const cols = lines.at(i).split(',').map(c => c.replace(/^"|"$/g, '').trim());
+          if (cols.length >= 4 && /^\d+$/.test(cols.at(0)) && cols.at(2) !== "") {
             count++;
           }
         }
