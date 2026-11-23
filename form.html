@@ -10,40 +10,53 @@
   <meta name="theme-color" content="#020617">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: #020617;
+    }
     body {
       background: radial-gradient(circle at top left, #064e3b, #020617 70%);
       color: #f8fafc;
-      height: 100vh;
-      overflow: hidden;
       display: flex;
       flex-direction: column;
-      padding: 12px 14px 86px 14px;
+      padding: 12px 14px 16px 14px;
       max-width: 480px;
       margin: 0 auto;
     }
-
     .glass {
-      background: rgba(15, 23, 42, 0.8);
+      background: rgba(15, 23, 42, 0.85);
       border: 1px solid rgba(52, 211, 153, 0.25);
       border-radius: 18px;
       backdrop-filter: blur(12px);
     }
-    .topbar { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .topbar { padding: 11px 14px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
     .title-wrap { display: flex; align-items: center; gap: 8px; }
     .dot { width: 9px; height: 9px; border-radius: 50%; background: #34d399; }
-    h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
-    .sub { font-size: 11px; color: #6ee7b7; margin-top: 2px; }
+    h1 { font-size: 16px; font-weight: 800; letter-spacing: 0.5px; }
+    .sub { font-size: 11px; color: #6ee7b7; margin-top: 2px; font-weight: 600; }
+    .btn-group { display: flex; gap: 6px; }
+    .btn-lihat {
+      background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(52, 211, 153, 0.4);
+      padding: 7px 11px; border-radius: 11px; font-size: 12px; font-weight: 700; text-decoration: none;
+    }
     .btn-logout {
       background: #1e293b; color: #cbd5e1; border: 1px solid #334155;
-      padding: 7px 13px; border-radius: 11px; font-size: 12px; font-weight: 600; cursor: pointer;
+      padding: 7px 12px; border-radius: 11px; font-size: 12px; font-weight: 600; cursor: pointer;
     }
     .main-card {
-      flex: 1; min-height: 0; margin-top: 10px; padding: 12px;
-      display: flex; flex-direction: column; gap: 8px;
+      flex: 1;
+      min-height: 0;
+      margin: 10px 0;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      overflow: hidden;
     }
     .search-wrap { position: relative; flex-shrink: 0; }
     .search-input {
-      width: 100%; padding: 11px 36px 11px 14px; border-radius: 13px;
+      width: 100%; padding: 10px 36px 10px 14px; border-radius: 13px;
       background: #0f172a; border: 1px solid #334155; color: #fff; font-size: 14px; outline: none;
     }
     .search-input:focus { border-color: #34d399; }
@@ -51,38 +64,54 @@
       position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
       background: none; border: none; color: #94a3b8; font-size: 15px; cursor: pointer; padding: 4px;
     }
-    select {
-      flex: 1; width: 100%; min-height: 80px; background: #0f172a; color: #f1f5f9;
-      border: 1px solid #1e293b; border-radius: 13px; padding: 6px; font-size: 14px; outline: none;
+    /* DAFTAR PEMILIH KUSTOM ANTI-DORONG */
+    .voter-list {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 13px;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
-    option { padding: 8px 10px; border-radius: 8px; }
-    option:checked { background: #059669; color: #fff; font-weight: 600; }
+    .voter-item {
+      padding: 9px 11px;
+      border-radius: 9px;
+      font-size: 13px;
+      color: #f1f5f9;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid transparent;
+    }
+    .voter-item:active { background: rgba(16, 185, 129, 0.15); }
+    .voter-item.selected {
+      background: #059669;
+      color: #ffffff;
+      font-weight: 700;
+      border-color: #34d399;
+    }
+    .voter-no { color: #34d399; font-weight: 800; margin-right: 6px; }
+    .voter-item.selected .voter-no { color: #a7f3d0; }
+    .voter-jk { font-size: 11px; opacity: 0.8; margin-left: 6px; flex-shrink: 0; }
+
     .detail-box {
       background: rgba(6, 78, 59, 0.45); border: 1px solid rgba(52, 211, 153, 0.3);
-      border-radius: 13px; padding: 11px 13px; flex-shrink: 0;
+      border-radius: 13px; padding: 10px 12px; flex-shrink: 0;
     }
     .detail-top { display: flex; justify-content: space-between; align-items: center; }
     .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #34d399; letter-spacing: 0.5px; }
     .badge-jk { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
-    .detail-name { margin-top: 4px; font-size: 14px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .detail-name { margin-top: 4px; font-size: 14px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .detail-no { color: #34d399; font-weight: 800; margin-right: 4px; }
-    .footer {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 480px;
-      padding: 8px 14px 16px 14px;
-      background: linear-gradient(to top, #020617 75%, rgba(2, 6, 23, 0));
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      z-index: 20;
-    }
-    .alert { padding: 9px 12px; border-radius: 11px; font-size: 12px; font-weight: 600; text-align: center; display: none; }
-    .alert.success { display: block; background: rgba(6, 78, 59, 0.9); border: 1px solid #10b981; color: #a7f3d0; }
-    .alert.error { display: block; background: rgba(127, 29, 29, 0.9); border: 1px solid #f43f5e; color: #fecdd3; }
+    .footer { flex-shrink: 0; display: flex; flex-direction: column; gap: 7px; }
+    .alert { padding: 8px 12px; border-radius: 11px; font-size: 12px; font-weight: 600; text-align: center; display: none; }
+    .alert.success { display: block; background: rgba(6, 78, 59, 0.95); border: 1px solid #10b981; color: #a7f3d0; }
+    .alert.error { display: block; background: rgba(127, 29, 29, 0.95); border: 1px solid #f43f5e; color: #fecdd3; }
     .btn-submit {
       width: 100%; padding: 14px; border-radius: 14px; border: none;
       background: linear-gradient(90deg, #10b981, #2dd4bf); color: #022c22;
@@ -101,8 +130,8 @@
       </div>
       <div id="sub-tps" class="sub">Menyiapkan data DPT...</div>
     </div>
-    <div style="display: flex; gap: 6px;">
-      <a href="hadir.html" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(52, 211, 153, 0.4); padding: 7px 11px; border-radius: 11px; font-size: 12px; font-weight: 700; text-decoration: none;">Lihat Hadir</a>
+    <div class="btn-group">
+      <a href="hadir.html" class="btn-lihat">Lihat Hadir</a>
       <button onclick="logout()" class="btn-logout">Keluar</button>
     </div>
   </div>
@@ -113,7 +142,7 @@
       <button onclick="clearSearch()" class="btn-clear">✕</button>
     </div>
 
-    <select id="select-pemilih" size="6" onchange="pilihPemilih()"></select>
+    <div id="list-pemilih" class="voter-list"></div>
 
     <div class="detail-box">
       <div class="detail-top">
@@ -132,7 +161,9 @@
     <button onclick="handleSubmit()" id="btn-submit" disabled class="btn-submit">CATAT KEHADIRAN</button>
   </div>
   <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxml_1ZhNvG62Ik4ETR7W8JeBeOQVccXhuRe1A4IBrjjEIhjuE11ZIcbJjfUqOWA3meLA/exec";
+    const GAS_HOST = "https://script." + "://google.com";
+    const GAS_ID = "AKfycbxml_1ZhNvG62Ik4ETR7W8JeBeOQVccXhuRe1A4IBrjjEIhjuE11ZIcbJjfUqOWA3meLA";
+    const APPS_SCRIPT_URL = GAS_HOST + GAS_ID + "/exec";
     const GITHUB_BASE = "./";
 
     const currentTps = sessionStorage.getItem("active_tps");
@@ -170,32 +201,41 @@
             });
           }
         }
+
         const jmlL = masterDpt.filter(item => item.jk === 'L').length;
         const jmlP = masterDpt.filter(item => item.jk === 'P').length;
 
         document.getElementById('sub-tps').innerText = `DPT: ${masterDpt.length} (L: ${jmlL} | P: ${jmlP})`;
-        renderDropdown(masterDpt);
+        renderList(masterDpt);
       } catch (e) {
         showToast('error', "Gagal memuat DPT: " + e.message);
       }
     }
 
-    function renderDropdown(data) {
-      const sel = document.getElementById('select-pemilih');
-      sel.innerHTML = "";
-      data.forEach((item, idx) => {
-        const opt = document.createElement('option');
-        opt.value = idx;
-        opt.text = `[${item.noDpt}] ${item.nama} (${item.jk})`;
-        opt.dataset.nodpt = item.noDpt;
-        sel.appendChild(opt);
-      });
+    function renderList(data) {
+      const container = document.getElementById('list-pemilih');
+      if (data.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:#64748b; font-size:13px;">Nama atau nomor DPT tidak ditemukan.</div>`;
+        return;
+      }
+
+      container.innerHTML = data.map(item => {
+        const isSel = selectedVoter && selectedVoter.noDpt === item.noDpt ? "selected" : "";
+        return `
+          <div class="voter-item ${isSel}" onclick="pilihPemilih('${item.noDpt}')">
+            <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+              <span class="voter-no">[${item.noDpt}]</span>${item.nama}
+            </div>
+            <span class="voter-jk">(${item.jk})</span>
+          </div>
+        `;
+      }).join('');
     }
 
     function filterDpt() {
       const kw = document.getElementById('search-dpt').value.toLowerCase();
-      renderDropdown(masterDpt.filter(i => i.nama.toLowerCase().includes(kw) || i.noDpt.toLowerCase().includes(kw)));
       resetSelection();
+      renderList(masterDpt.filter(i => i.nama.toLowerCase().includes(kw) || i.noDpt.toLowerCase().includes(kw)));
     }
 
     function clearSearch() {
@@ -215,11 +255,8 @@
       document.getElementById('btn-submit').disabled = true;
     }
 
-    function pilihPemilih() {
-      const sel = document.getElementById('select-pemilih');
-      const opt = sel.options[sel.selectedIndex];
-      if (!opt) return;
-      selectedVoter = masterDpt.find(d => d.noDpt === opt.dataset.nodpt);
+    function pilihPemilih(noDpt) {
+      selectedVoter = masterDpt.find(d => d.noDpt === String(noDpt));
       if (selectedVoter) {
         document.getElementById('det-nodpt').innerText = `#${selectedVoter.noDpt}`;
         const namaEl = document.getElementById('det-nama');
@@ -230,6 +267,13 @@
         document.getElementById('det-jk').innerText = selectedVoter.jk === 'L' ? 'Laki-laki' : 'Perempuan';
         document.getElementById('btn-submit').disabled = false;
         hideToast();
+
+        // Tandai baris yang diketuk tanpa me-reset posisi gulir
+        const kw = document.getElementById('search-dpt').value.toLowerCase();
+        const currentFiltered = masterDpt.filter(i => i.nama.toLowerCase().includes(kw) || i.noDpt.toLowerCase().includes(kw));
+        const scrollPos = document.getElementById('list-pemilih').scrollTop;
+        renderList(currentFiltered);
+        document.getElementById('list-pemilih').scrollTop = scrollPos;
       }
     }
 
@@ -258,7 +302,7 @@
           showToast('success', "✓ " + data.message);
           document.getElementById('search-dpt').value = "";
           resetSelection();
-          renderDropdown(masterDpt);
+          renderList(masterDpt);
         } else {
           btn.disabled = false;
           showToast('error', "⚠ " + data.message);
