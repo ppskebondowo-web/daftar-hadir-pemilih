@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.ppskebondowo_web.twa",
+        "sha256_cert_fingerprints": ["2B:44:A5:5D:CD:06:F8:FE:60:76:B9:69:BF:0F:6E:A6:A7:73:9A:71:7E:A1:04:45:3E:E4:80:99:F5:7F:51:3A"]
+      }
+    }]
