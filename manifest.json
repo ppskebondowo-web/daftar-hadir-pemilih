@@ -1,0 +1,17 @@
+{
+  "name": "E-Presensi Pilkades Kebondowo 2026",
+  "short_name": "E-Presensi TPS",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://flaticon.com",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
