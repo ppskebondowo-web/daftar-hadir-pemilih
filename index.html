@@ -234,20 +234,7 @@
         icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
       }
     }
-    function toggleFullscreen() {
-      const elem = document.documentElement;
-      if (!document.fullscreenElement) {
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen().catch(() => {});
-    } else if (elem.webkitRequestFullscreen) {
-        elem.webkitRequestFullscreen();
-    }
-  } else {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    }
-  }
-}      
+ 
     function showError(msg) {
       const el = document.getElementById('login-error');
       el.innerText = msg;
@@ -275,7 +262,6 @@
     }
 
     async function handleLogin() {
-      toggleFullscreen();
       const pass = document.getElementById('input-password').value.trim();
       const btn = document.getElementById('btn-login');
       document.getElementById('login-error').style.display = "none";
