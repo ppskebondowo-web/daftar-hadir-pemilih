@@ -51,10 +51,10 @@
       position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
       background: none; border: none; color: #94a3b8; font-size: 15px; cursor: pointer; padding: 4px;
     }
-    select {
-      flex: 1; width: 100%; min-height: 120px; max-height: 46dvh; background: #0f172a; color: #f1f5f9;
-      border: 1px solid #1e293b; border-radius: 13px; padding: 6px; font-size: 14px; outline: none;
-    }
+ select {
+   flex: 1; width: 100%; min-height: 100px; height: 34dvh; background: #0f172a; color: #f1f5f9;
+   border: 1px solid #1e293b; border-radius: 13px; padding: 6px; font-size: 14px; outline: none;
+ }
     option { padding: 8px 10px; border-radius: 8px; }
     option:checked { background: #059669; color: #fff; font-weight: 600; }
     .detail-box {
@@ -66,7 +66,7 @@
     .badge-jk { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
     .detail-name { margin-top: 4px; font-size: 14px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .detail-no { color: #34d399; font-weight: 800; margin-right: 4px; }
-    .footer { flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
+    .footer { flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; padding-bottom: env(safe-area-inset-bottom, 10px); }
     .alert { padding: 9px 12px; border-radius: 11px; font-size: 12px; font-weight: 600; text-align: center; display: none; }
     .alert.success { display: block; background: rgba(6, 78, 59, 0.9); border: 1px solid #10b981; color: #a7f3d0; }
     .alert.error { display: block; background: rgba(127, 29, 29, 0.9); border: 1px solid #f43f5e; color: #fecdd3; }
@@ -100,7 +100,7 @@
       <button onclick="clearSearch()" class="btn-clear">✕</button>
     </div>
 
-    <select id="select-pemilih" size="10" onchange="pilihPemilih()"></select>
+    <select id="select-pemilih" size="6" onchange="pilihPemilih()"></select>
 
     <div class="detail-box">
       <div class="detail-top">
