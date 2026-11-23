@@ -189,7 +189,11 @@
     function resetSelection() {
       selectedVoter = null;
       document.getElementById('det-nodpt').innerText = "#-";
-      document.getElementById('det-nama').innerText = "Ketuk nama pada daftar di atas";
+      const namaEl = document.getElementById('det-nama');
+      namaEl.innerText = "Ketuk nama pada daftar di atas";
+      namaEl.style.fontStyle = "italic";
+      namaEl.style.fontWeight = "400";
+      namaEl.style.color = "#94a3b8";
       document.getElementById('det-jk').innerText = "-";
       document.getElementById('btn-submit').disabled = true;
     }
@@ -201,7 +205,11 @@
       selectedVoter = masterDpt.find(d => d.noDpt === opt.dataset.nodpt);
       if (selectedVoter) {
         document.getElementById('det-nodpt').innerText = `#${selectedVoter.noDpt}`;
-        document.getElementById('det-nama').innerText = selectedVoter.nama;
+        const namaEl = document.getElementById('det-nama');
+        namaEl.innerText = selectedVoter.nama;
+        namaEl.style.fontStyle = "normal";
+        namaEl.style.fontWeight = "700";
+        namaEl.style.color = "#ffffff";
         document.getElementById('det-jk').innerText = selectedVoter.jk === 'L' ? 'Laki-laki' : 'Perempuan';
         document.getElementById('btn-submit').disabled = false;
         hideToast();
