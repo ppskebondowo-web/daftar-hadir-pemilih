@@ -400,7 +400,7 @@
     if (sessionStorage.getItem("is_admin") === "true") {
       activateAdminMode();
     }
-        function updateClock() {
+    function updateClock() {
       const now = new Date();
       const tgl = now.toLocaleDateString('id-ID', {
         weekday: 'long', day: 'numeric', month: 'short', year: 'numeric'
@@ -416,6 +416,9 @@
     }
     setInterval(updateClock, 1000);
     updateClock();
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
   </script>
 </body>
 </html>
