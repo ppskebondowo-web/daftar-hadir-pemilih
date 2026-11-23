@@ -14,16 +14,16 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 24px 18px;
+      padding: 20px 16px;
     }
-    .spacer { height: 10px; }
+    .spacer { height: 6px; }
     .container {
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
       margin: auto;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
     }
     .header { text-align: center; }
     .pill {
@@ -37,10 +37,10 @@
       background: rgba(16, 185, 129, 0.15);
       color: #6ee7b7;
       border: 1px solid rgba(52, 211, 153, 0.3);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
     h1 {
-      font-size: 25px;
+      font-size: 24px;
       font-weight: 800;
       letter-spacing: 0.5px;
       background: linear-gradient(90deg, #ffffff, #a7f3d0, #2dd4bf);
@@ -49,10 +49,10 @@
     }
     .subtitle { font-size: 12px; color: #94a3b8; margin-top: 4px; }
     .glass {
-      background: rgba(15, 23, 42, 0.82);
+      background: rgba(15, 23, 42, 0.85);
       border: 1px solid rgba(52, 211, 153, 0.25);
       border-radius: 22px;
-      padding: 24px 20px;
+      padding: 22px 18px;
       backdrop-filter: blur(14px);
       box-shadow: 0 20px 35px -15px rgba(0, 0, 0, 0.6);
     }
@@ -108,7 +108,6 @@
       font-weight: 800;
       letter-spacing: 0.8px;
       cursor: pointer;
-      transition: opacity 0.2s;
     }
     .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
     .err-box {
@@ -123,12 +122,48 @@
       font-weight: 600;
       text-align: center;
     }
-    .footer {
-      text-align: center;
-      font-size: 11px;
-      color: #64748b;
-      padding-top: 12px;
+    /* ADMIN PANEL STYLES */
+    .hidden { display: none !important; }
+    .admin-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .admin-title { font-size: 13px; font-weight: 800; color: #fde047; text-transform: uppercase; letter-spacing: 0.5px; }
+    .admin-sub { font-size: 11px; color: #cbd5e1; margin-top: 2px; }
+    .admin-actions { display: flex; gap: 6px; }
+    .btn-sm {
+      padding: 7px 11px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer;
+      background: #1e293b; border: 1px solid #334155; color: #34d399;
     }
+    .btn-sm.exit { color: #fda4af; border-color: rgba(244, 63, 94, 0.3); }
+    .prog-bg { width: 100%; height: 8px; background: #1e293b; border-radius: 99px; overflow: hidden; margin-bottom: 14px; }
+    .prog-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #10b981, #22d3ee); border-radius: 99px; transition: width 0.5s ease; }
+    .tps-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 9px;
+      max-height: 55dvh;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+    .tps-badge {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      border-radius: 15px;
+      padding: 11px 12px;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.2s;
+      text-align: left;
+    }
+    .tps-badge:active { transform: scale(0.97); }
+    .tps-badge:hover { border-color: #34d399; }
+    .b-top { display: flex; justify-content: space-between; align-items: center; }
+    .b-name { font-size: 12px; font-weight: 800; color: #34d399; }
+    .b-pct { font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 6px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+    .b-num { display: flex; justify-content: space-between; align-items: baseline; margin-top: 7px; }
+    .b-hadir { font-size: 16px; font-weight: 800; color: #ffffff; }
+    .b-dpt { font-size: 10px; color: #94a3b8; }
+    .b-bar { width: 100%; height: 4px; background: #1e293b; border-radius: 99px; margin-top: 7px; overflow: hidden; }
+    .b-fill { height: 100%; background: #34d399; border-radius: 99px; }
+    .hint-tap { text-align: center; font-size: 11px; color: #64748b; margin-top: 10px; }
+    .footer { text-align: center; font-size: 11px; color: #64748b; padding-top: 12px; }
   </style>
 </head>
 <body>
@@ -142,7 +177,8 @@
       <div class="subtitle">Kecamatan Banyubiru • Kabupaten Semarang</div>
     </div>
 
-    <div class="glass">
+    <!-- KARTU LOGIN -->
+    <div id="login-card" class="glass">
       <label class="lbl-center" for="input-password">Akses Petugas KPPS</label>
       <div class="pass-wrap">
         <input type="password" id="input-password" class="pass-input" placeholder="Masukkan Password TPS">
@@ -156,14 +192,35 @@
       <button onclick="handleLogin()" id="btn-login" class="btn-login">MASUK KE FORM TPS</button>
       <div id="login-error" class="err-box"></div>
     </div>
+
+    <!-- PANEL ADMIN PUSAT -->
+    <div id="admin-card" class="glass hidden">
+      <div class="admin-head">
+        <div>
+          <div class="admin-title">Monitoring Admin Pusat</div>
+          <div class="admin-sub" id="admin-summary">Menghitung partisipasi...</div>
+        </div>
+        <div class="admin-actions">
+          <button onclick="loadAdminPanel()" id="btn-ref-admin" class="btn-sm">↻</button>
+          <button onclick="logoutAdmin()" class="btn-sm exit">Keluar</button>
+        </div>
+      </div>
+
+      <div class="prog-bg">
+        <div id="admin-prog-bar" class="prog-fill"></div>
+      </div>
+
+      <div id="tps-grid" class="tps-grid"></div>
+      <div class="hint-tap">*Ketuk badge TPS untuk melihat daftar pemilih hadir</div>
+    </div>
   </div>
 
   <footer class="footer">
     &copy; Panitia Pemilihan Kepala Desa Kebondowo 2026
   </footer>
-
   <script>
     const GITHUB_BASE = "./";
+    const SHEET_ID = "1c8FXsD2PT_bqXe3eIoO7jceb2DZeMwfEcrMgp55K-nw";
 
     function togglePassword() {
       const inp = document.getElementById('input-password');
@@ -183,12 +240,38 @@
       el.style.display = "block";
     }
 
+    function activateAdminMode() {
+      sessionStorage.setItem("is_admin", "true");
+      document.getElementById('login-card').classList.add('hidden');
+      document.getElementById('admin-card').classList.remove('hidden');
+      loadAdminPanel();
+    }
+
+    function logoutAdmin() {
+      sessionStorage.removeItem("is_admin");
+      sessionStorage.removeItem("active_tps");
+      document.getElementById('input-password').value = "";
+      document.getElementById('admin-card').classList.add('hidden');
+      document.getElementById('login-card').classList.remove('hidden');
+    }
+
+    function openTpsDetail(tpsName) {
+      sessionStorage.setItem("active_tps", tpsName);
+      window.location.href = "hadir.html";
+    }
+
     async function handleLogin() {
       const pass = document.getElementById('input-password').value.trim();
       const btn = document.getElementById('btn-login');
       document.getElementById('login-error').style.display = "none";
 
       if (!pass) return showError("Masukkan password TPS terlebih dahulu.");
+
+      // Cek Password AdminPusat
+      if (pass === "AdminPusat") {
+        activateAdminMode();
+        return;
+      }
 
       btn.disabled = true;
       btn.innerText = "MEMERIKSA AKSES...";
@@ -213,6 +296,7 @@
           return showError("Password salah atau tidak terdaftar.");
         }
 
+        sessionStorage.removeItem("is_admin");
         sessionStorage.setItem("active_tps", foundTps);
         window.location.href = "form.html";
 
@@ -223,9 +307,84 @@
       }
     }
 
+    async function getSheetHadirCount(tpsName) {
+      try {
+        const query = encodeURIComponent("SELECT COUNT(C) WHERE A IS NOT NULL LABEL COUNT(C) ''");
+        const gvizPath = ["https:", "", "://google.com", "spread" + "sheets", "d", SHEET_ID, "gviz", "tq"].join("/");
+        const url = `${gvizPath}?tqx=out:csv&sheet=${encodeURIComponent(tpsName)}&tq=${query}&t=${Date.now()}`;
+        const res = await fetch(url);
+        if (!res.ok) return 0;
+        const txt = (await res.text()).replace(/"/g, '').trim();
+        const num = parseInt(txt, 10);
+        // Kurangi 1 jika header kolom "Nama" ikut terhitung
+        return isNaN(num) ? 0 : Math.max(0, num - 1);
+      } catch (e) {
+        return 0;
+      }
+    }
+
+    async function loadAdminPanel() {
+      const btn = document.getElementById('btn-ref-admin');
+      const grid = document.getElementById('tps-grid');
+      const sumEl = document.getElementById('admin-summary');
+      btn.innerText = "...";
+      sumEl.innerText = "Menghitung data 11 TPS...";
+
+      const tasks = [];
+      for (let i = 1; i <= 11; i++) {
+        const tpsName = "TPS " + String(i).padStart(3, '0');
+        tasks.push(
+          Promise.all([
+            fetch(`${GITHUB_BASE}${encodeURIComponent(tpsName + ".csv")}?t=${Date.now()}`).then(r => r.ok ? r.text() : ""),
+            getSheetHadirCount(tpsName)
+          ]).then(([csvTxt, hadirCount]) => {
+            const dptCount = csvTxt.split(/\r?\n/).filter(l => /^\d+;/.test(l.trim())).length;
+            return { tps: tpsName, dpt: dptCount, hadir: hadirCount };
+          })
+        );
+      }
+
+      const results = await Promise.all(tasks);
+      let totalDpt = 0, totalHadir = 0, html = "";
+
+      results.forEach(item => {
+        totalDpt += item.dpt;
+        totalHadir += item.hadir;
+        const pct = item.dpt > 0 ? ((item.hadir / item.dpt) * 100).toFixed(1) : "0.0";
+        const barWidth = Math.min(100, parseFloat(pct));
+
+        html += `
+          <div class="tps-badge" onclick="openTpsDetail('${item.tps}')">
+            <div class="b-top">
+              <span class="b-name">${item.tps}</span>
+              <span class="b-pct">${pct}%</span>
+            </div>
+            <div class="b-num">
+              <span class="b-hadir">${item.hadir}</span>
+              <span class="b-dpt">/ ${item.dpt} DPT</span>
+            </div>
+            <div class="b-bar">
+              <div class="b-fill" style="width: ${barWidth}%"></div>
+            </div>
+          </div>
+        `;
+      });
+
+      grid.innerHTML = html;
+      const totalPct = totalDpt > 0 ? ((totalHadir / totalDpt) * 100).toFixed(1) : "0.0";
+      sumEl.innerText = `Total: ${totalHadir} / ${totalDpt} Pemilih (${totalPct}%)`;
+      document.getElementById('admin-prog-bar').style.width = `${Math.min(100, parseFloat(totalPct))}%`;
+      btn.innerText = "↻";
+    }
+
     document.getElementById('input-password').addEventListener('keypress', e => {
       if (e.key === 'Enter') handleLogin();
     });
+
+    // Jika kembali dari halaman hadir.html sebagai AdminPusat, langsung buka panel admin
+    if (sessionStorage.getItem("is_admin") === "true") {
+      activateAdminMode();
+    }
   </script>
 </body>
 </html>
