@@ -60,7 +60,7 @@
     </div>
     <div class="btn-group">
       <button onclick="loadHadir()" id="btn-ref" class="btn-refresh">↻</button>
-      <a href="form.html" class="btn-back">← Kembali</a>
+      <button onclick="kembali()" class="btn-back">← Kembali</button>
     </div>
   </div>
   <div class="glass card-list">
@@ -175,6 +175,13 @@
       );
       renderTable(filtered);
     }
+    function kembali() {
+  if (sessionStorage.getItem("is_admin") === "true") {
+    window.location.href = "index.html";
+  } else {
+    window.location.href = "form.html";
+  }
+}
     loadHadir();
   </script>
 </body>
