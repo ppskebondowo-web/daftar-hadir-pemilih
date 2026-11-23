@@ -275,6 +275,7 @@
     }
 
     async function handleLogin() {
+      toggleFullscreen();
       const pass = document.getElementById('input-password').value.trim();
       const btn = document.getElementById('btn-login');
       document.getElementById('login-error').style.display = "none";
