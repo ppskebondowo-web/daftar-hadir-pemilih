@@ -17,7 +17,7 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      padding: 14px;
+      padding: 14px 14px 48px 14px;
       max-width: 480px;
       margin: 0 auto;
     }
@@ -50,6 +50,10 @@
     thead { position: sticky; top: 0; background: #064e3b; color: #a7f3d0; z-index: 1; }
     th { padding: 9px 8px; font-weight: 700; font-size: 11px; text-transform: uppercase; }
     td { padding: 9px 8px; border-bottom: 1px solid #1e293b; color: #f1f5f9; }
+    tbody tr:last-child td {
+      padding-bottom: 24px;
+      border-bottom: none;
+    }
     tr:nth-child(even) { background: rgba(30, 41, 59, 0.4); }
     .badge-dpt { color: #34d399; font-weight: 800; }
     .time-text { font-size: 10px; color: #94a3b8; display: block; margin-top: 2px; }
